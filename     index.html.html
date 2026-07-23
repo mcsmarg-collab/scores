@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sports Wall Pro — Portrait Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#07090d;--panel:#121722;--ink:#f6f1e7;--muted:#a9a49a;--gold:#f0bd3d;--red:#e7474d;--green:#4dc275;
+  --a:#f0bd3d;--b:#2f7dff;--logoA:transparent;--logoB:transparent;
+}
+*{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:#000;color:var(--ink);font-family:Archivo,system-ui,sans-serif}
+/* Rotate whole website for a TV mounted vertically. Change rotate(90deg) to rotate(-90deg) if upside down. */
+.rotator{position:fixed;left:50%;top:50%;width:100vh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center;overflow:hidden;background:var(--void)}
+.stage{position:relative;width:100%;height:100%;overflow:hidden;background:#07090d;isolation:isolate}
+.bg{position:absolute;inset:-8%;z-index:0;overflow:hidden;background:
+  radial-gradient(circle at var(--x1,22%) var(--y1,24%), color-mix(in srgb,var(--a),transparent 35%) 0 9%, transparent 33%),
+  radial-gradient(circle at var(--x2,78%) var(--y2,70%), color-mix(in srgb,var(--b),transparent 30%) 0 8%, transparent 35%),
+  linear-gradient(var(--angle,130deg), #05070b, #111827 47%, #05070b);
+  animation:bgDrift 18s ease-in-out infinite alternate;filter:saturate(1.25) contrast(1.05)}
+@keyframes bgDrift{from{transform:scale(1) translate3d(0,0,0)}to{transform:scale(1.08) translate3d(-2%,1.5%,0)}}
+.bg:before,.bg:after{content:"";position:absolute;inset:-20%;pointer-events:none}.bg:before{background:var(--pattern),var(--pattern2);opacity:.68;mix-blend-mode:screen;animation:pan 32s linear infinite}.bg:after{background:radial-gradient(circle at var(--sparkX,50%) var(--sparkY,50%), color-mix(in srgb,var(--gold),transparent 70%) 0 4%, transparent 23%),conic-gradient(from var(--spin,0deg) at 50% 50%, transparent 0 20%, color-mix(in srgb,var(--a),transparent 82%) 24%, transparent 33%, color-mix(in srgb,var(--b),transparent 84%) 46%, transparent 60% 100%),radial-gradient(ellipse at center,transparent 28%,rgba(0,0,0,.72) 76%),linear-gradient(90deg,rgba(255,255,255,.035),transparent 18%,transparent 82%,rgba(255,255,255,.035));animation:slowSpin 26s linear infinite;}@keyframes slowSpin{to{--spin:360deg}}
+@keyframes pan{to{transform:translate3d(-7%,4%,0) rotate(.5deg)}}
+.logoGhost{position:absolute;inset:0;z-index:0;opacity:.10;background-image:var(--logoA),var(--logoB);background-repeat:no-repeat;background-position:left -7% center,right -7% center;background-size:48% auto,48% auto;filter:blur(1px) grayscale(.15);animation:ghost 12s ease-in-out infinite alternate}@keyframes ghost{to{opacity:.16;transform:scale(1.025)}}
+.fx{position:absolute;inset:0;z-index:1;pointer-events:none}.fx span{position:absolute;display:block;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:0 0 22px currentColor;opacity:.5;animation:floatUp var(--d,10s) linear infinite;left:var(--l);top:105%;width:var(--s);height:var(--s);color:var(--c,#fff)}@keyframes floatUp{to{transform:translateY(-125vh) translateX(var(--dx,0));opacity:0}}
+.scoreFlash{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--a),transparent 25%),transparent 55%);opacity:0}.scoreFlash.on{animation:flash .9s ease}@keyframes flash{0%{opacity:0}30%{opacity:.55}100%{opacity:0}}
+.poster{position:absolute;inset:0;z-index:3;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(20px,4vh,44px);gap:clamp(10px,2vh,20px)}
+.topBar{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;min-height:92px}.matchFull{font-family:Bebas Neue,Impact,sans-serif;font-size:clamp(30px,6.2vh,72px);letter-spacing:.8px;line-height:.92;text-shadow:0 8px 30px rgba(0,0,0,.65);max-width:83%;text-wrap:balance}.matchFull small{display:block;font:700 clamp(10px,1.35vh,14px)/1 Space Mono,monospace;color:var(--gold);letter-spacing:3px;margin-bottom:7px;text-transform:uppercase}.statusStack{display:grid;gap:8px;justify-items:end}.badge{font:900 clamp(12px,1.6vh,18px)/1 Archivo,sans-serif;padding:9px 12px;border-radius:999px;background:rgba(8,12,18,.74);border:1px solid rgba(255,255,255,.18);box-shadow:0 10px 35px rgba(0,0,0,.34);white-space:nowrap}.badge.live{color:#fff;background:linear-gradient(135deg,#e5223b,#ff7b4f);animation:pulse 1.4s infinite}.badge.upcoming{color:#07100b;background:#73ff9a}.badge.final{color:#111;background:#d5d3ca}.clock{font:700 12px Space Mono,monospace;color:rgba(246,241,231,.72);background:rgba(0,0,0,.32);padding:7px 10px;border-radius:999px;white-space:nowrap}@keyframes pulse{50%{transform:scale(1.045);box-shadow:0 0 24px rgba(231,71,77,.55)}}
+.hero{min-height:0;display:grid;grid-template-rows:auto 1fr auto;align-items:center;gap:10px}.teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:clamp(10px,3vw,36px)}.team{min-width:0;display:grid;gap:10px;align-items:center;justify-items:center;text-align:center}.logoWrap{position:relative;width:clamp(110px,22vh,260px);height:clamp(110px,22vh,260px);display:grid;place-items:center}.teamLogo{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 16px 24px rgba(0,0,0,.55));position:relative;z-index:2}.logoFallback{position:absolute;inset:6%;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,var(--tc),rgba(255,255,255,.10));border:2px solid rgba(255,255,255,.26);font:900 clamp(20px,5.5vh,64px) Archivo,sans-serif;color:white;text-shadow:0 6px 20px rgba(0,0,0,.7);box-shadow:0 18px 45px rgba(0,0,0,.38)}.teamLogo[src=""],.teamLogo.broken{display:none}.teamName{font:900 clamp(24px,3.8vh,52px)/.9 Archivo,sans-serif;text-transform:uppercase;letter-spacing:.6px;text-shadow:0 8px 24px rgba(0,0,0,.65);max-width:100%;overflow:hidden;text-overflow:ellipsis}.teamRec{font:700 clamp(10px,1.3vh,14px) Space Mono,monospace;color:rgba(246,241,231,.68)}.scoreBox{display:grid;place-items:center;gap:8px;width:100%}.score{font:900 clamp(56px,14.5vh,180px)/.82 Oswald,Impact,sans-serif;letter-spacing:-3px;text-shadow:0 0 42px rgba(0,0,0,.8)}.scorePair{display:grid;grid-template-columns:minmax(120px,1fr) auto minmax(120px,1fr);gap:14px;align-items:stretch;width:min(92vw,620px)}.scoreTeam{text-align:center;border-radius:24px;padding:12px 14px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.28));border:2px solid color-mix(in srgb,var(--teamScoreColor),white 22%);box-shadow:0 16px 48px rgba(0,0,0,.36), inset 0 0 32px color-mix(in srgb,var(--teamScoreColor),transparent 78%)}.scoreLabel{font:900 clamp(15px,2.25vh,28px) Archivo,sans-serif;color:#fff;letter-spacing:.8px;margin-bottom:8px;text-transform:uppercase;text-shadow:0 5px 18px rgba(0,0,0,.7)}.scoreSub{font:900 clamp(11px,1.5vh,17px) Space Mono,monospace;color:var(--gold);margin-top:5px;letter-spacing:1px;text-transform:uppercase}.score.sep{align-self:center;font-size:clamp(24px,6vh,70px);letter-spacing:0;color:rgba(246,241,231,.55)}.centerMeta{text-align:center;font:800 clamp(11px,1.65vh,19px)/1.25 Space Mono,monospace;color:rgba(246,241,231,.9);text-transform:uppercase;letter-spacing:1.6px}.countdown{color:var(--gold)}
+.infoGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-width:0}.card{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:12px;min-width:0;box-shadow:0 14px 35px rgba(0,0,0,.18);backdrop-filter:blur(8px)}.card b{display:block;font:800 10px Space Mono,monospace;color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:4px}.card span{font:700 clamp(11px,1.45vh,15px) Archivo,sans-serif;color:rgba(246,241,231,.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.bottom{display:grid;gap:9px}.statsDock{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:10px 12px;min-height:58px}.statsTitle{font:900 12px Space Mono,monospace;color:#080a0d;background:var(--gold);border-radius:999px;padding:8px 10px;white-space:nowrap}.statsScroller{overflow:hidden;white-space:nowrap}.statsText{display:inline-block;font:800 clamp(12px,1.7vh,18px) Archivo,sans-serif;animation:ticker 70s linear infinite}.statsText span{margin-right:34px}.ticker{height:34px;background:#05070b;border-top:1px solid rgba(255,255,255,.16);border-bottom:1px solid rgba(255,255,255,.16);display:flex;align-items:center;overflow:hidden;margin-inline:-44px}.tickerTrack{white-space:nowrap;font:800 13px Space Mono,monospace;color:rgba(246,241,231,.88);animation:ticker 110s linear infinite}.tickerTrack span{margin-right:42px}.tickerTrack b{color:var(--gold)}@keyframes ticker{to{transform:translateX(-50%)}}
+.dots{display:none}.slideCounter{display:none}
+.controls{position:absolute;z-index:30;top:14px;left:14px;display:flex;gap:8px}.btn{font:800 12px Archivo,sans-serif;background:rgba(10,13,18,.7);color:#eee;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:9px 12px;cursor:pointer;backdrop-filter:blur(6px)}body.kiosk .controls,body.kiosk .dots{opacity:0;pointer-events:none}.toast{position:absolute;z-index:50;left:50%;bottom:70px;transform:translateX(-50%);background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 14px;font:700 13px Archivo,sans-serif}.overlay{position:absolute;inset:0;z-index:80;background:rgba(0,0,0,.78);display:grid;place-items:center}.panel{width:min(760px,92%);max-height:86%;overflow:auto;background:#111827;border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:20px}.panel h2{margin:0 0 8px;font:42px Bebas Neue;color:var(--gold);letter-spacing:1px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chip{border:1px solid rgba(255,255,255,.18);border-radius:999px;background:transparent;color:#ddd;padding:8px 12px;font-weight:800}.chip.on{background:var(--gold);color:#111}.gameRow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin:7px 0}.gameRow strong{display:block}.gameRow small{color:#aaa}.add{background:var(--gold);border:0;border-radius:9px;padding:8px 12px;font-weight:900}.add.remove{background:#e7474d;color:white}.section{margin-top:14px;color:#aaa;font:800 11px Space Mono,monospace;letter-spacing:2px;text-transform:uppercase}
+/* 20 very different layout skins */
+.skin-0 .poster{background:linear-gradient(90deg,rgba(0,0,0,.28),transparent)}.skin-0 .score{color:#fff}.skin-0 .card{border-radius:4px}.skin-1 .bg:before{filter:contrast(1.3)}.skin-1 .teamLogo{border-radius:50%;background:rgba(255,255,255,.08);padding:12px}.skin-1 .score{color:var(--gold)}.skin-2 .poster{border:16px solid rgba(240,189,61,.48)}.skin-2 .card,.skin-2 .statsDock{border-style:dashed}.skin-3 .bg{filter:hue-rotate(18deg) saturate(1.5)}.skin-3 .score{text-shadow:6px 6px 0 rgba(0,0,0,.35),0 0 35px var(--a)}.skin-4 .poster{background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 2px,transparent 2px 8px)}.skin-4 .teamName,.skin-4 .matchFull{font-family:Space Mono,monospace}.skin-5 .card{background:rgba(246,241,231,.88);color:#111}.skin-5 .card span{color:#111}.skin-5 .score{color:#f5f5f5}.skin-6 .poster{box-shadow:inset 0 0 0 10px rgba(255,255,255,.12),inset 0 0 0 20px rgba(0,0,0,.25)}.skin-7 .teamLogo{transform:rotate(-3deg)}.skin-7 .team:nth-child(3) .teamLogo{transform:rotate(3deg)}.skin-8 .score{font-family:Bebas Neue}.skin-8 .card{transform:skew(-4deg)}.skin-9 .bg:after{background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 18%,rgba(0,0,0,.65)),radial-gradient(ellipse at center,transparent 35%,#000 83%)}.skin-10 .poster{background:linear-gradient(135deg,rgba(255,255,255,.06),transparent 30%,rgba(255,255,255,.08))}.skin-11 .matchFull{text-align:center;max-width:100%}.skin-11 .topBar{grid-template-columns:1fr}.skin-11 .statusStack{position:absolute;right:44px;top:44px}.skin-12 .card,.skin-12 .statsDock{box-shadow:0 0 22px color-mix(in srgb,var(--a),transparent 65%)}.skin-13 .bg{background:linear-gradient(180deg,#111,#050505)}.skin-13 .bg:before{background:repeating-linear-gradient(90deg,rgba(240,189,61,.16) 0 1px,transparent 1px 60px),repeating-linear-gradient(0deg,rgba(240,189,61,.10) 0 1px,transparent 1px 60px)}.skin-14 .team{background:rgba(0,0,0,.28);border-radius:28px;padding:14px}.skin-15 .poster{filter:contrast(1.08)}.skin-15 .badge{border-radius:2px}.skin-16 .scoreBox{background:rgba(0,0,0,.33);border-radius:36px;padding:18px}.skin-17 .matchFull{color:var(--gold)}.skin-17 .teamName{color:#fff}.skin-18 .card{background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.03));border-radius:30px}.skin-19 .poster{background:radial-gradient(circle at 50% 50%,transparent 0 35%,rgba(0,0,0,.3) 36% 100%)}
+@media(max-height:640px){.infoGrid{grid-template-columns:repeat(2,1fr)}.card:nth-child(n+3){display:none}.matchFull{font-size:clamp(28px,5vh,48px)}.topBar{min-height:72px}.logoWrap{width:clamp(86px,16vh,170px);height:clamp(86px,16vh,170px)}}
+
+
+/* ---- V3 Fire TV performance + safe-fit overrides ----
+   This version is intentionally lighter so Silk/Fire Stick does not lag, and
+   everything stays inside the rotated portrait screen. */
+.rotator{background:#05070b;}
+.stage{contain:layout paint style;}
+.bg{inset:0;filter:none !important;animation:bgDrift 46s ease-in-out infinite alternate !important;opacity:.95;}
+@keyframes bgDrift{from{transform:scale(1)}to{transform:scale(1.025)}}
+.bg:before{opacity:.34 !important;animation:pan 90s linear infinite !important;}
+.bg:after{opacity:.55;animation:none !important;background:
+  radial-gradient(circle at var(--sparkX,50%) var(--sparkY,50%), color-mix(in srgb,var(--gold),transparent 78%) 0 7%, transparent 28%),
+  radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.76) 82%),
+  linear-gradient(90deg,rgba(255,255,255,.03),transparent 20%,transparent 80%,rgba(255,255,255,.03));}
+.logoGhost{opacity:.07;filter:none;animation:none;background-size:40% auto,40% auto;}
+.fx{display:none !important;}
+.poster{inset:0;transform:scale(.88);transform-origin:center;grid-template-rows:clamp(86px,15%,132px) minmax(0,1fr) clamp(120px,20%,180px);padding:clamp(12px,2.2vh,24px);gap:clamp(6px,1.1vh,12px);}
+.topBar{min-height:0;align-items:start;grid-template-columns:minmax(0,1fr) auto;gap:10px;}
+.matchFull{max-width:none;font-size:clamp(22px,4.5vh,46px);line-height:.95;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance;}
+.matchFull small{font-size:clamp(8px,1.05vh,12px);margin-bottom:5px;letter-spacing:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.statusStack{gap:5px}.badge{font-size:clamp(10px,1.25vh,14px);padding:7px 10px}.clock{font-size:10px;padding:6px 8px;}
+.hero{grid-template-rows:auto minmax(0,1fr) auto;gap:7px;min-height:0;overflow:hidden;}
+.centerMeta{font-size:clamp(9px,1.25vh,14px);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.teams{min-height:0;grid-template-columns:minmax(0,1fr) minmax(210px,42%,430px) minmax(0,1fr);gap:clamp(6px,1.2vw,16px);align-items:center;}
+.team{gap:5px;min-width:0;overflow:hidden;}
+.logoWrap{width:clamp(72px,14vh,145px);height:clamp(72px,14vh,145px);}
+.logoFallback{font-size:clamp(18px,3.7vh,42px);}
+.teamName{font-size:clamp(15px,2.25vh,28px);line-height:.95;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;}
+.teamRec{font-size:clamp(8px,1.05vh,12px);}
+.scoreBox{min-width:0}.scorePair{width:100%;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:7px;}
+.scoreTeam{border-radius:16px;padding:8px 6px;min-width:0;}
+.scoreLabel{font-size:clamp(10px,1.5vh,18px);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.score{font-size:clamp(38px,9.5vh,100px);letter-spacing:-1px;}
+.score.sep{font-size:clamp(18px,4vh,40px);}
+.scoreSub{font-size:clamp(8px,1.05vh,11px);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.countdown{font-size:clamp(26px,6vh,58px);white-space:normal;text-align:center;}
+.infoGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+.card{border-radius:12px;padding:8px;backdrop-filter:none !important;}
+.card b{font-size:8px;margin-bottom:2px;letter-spacing:1px;}.card span{font-size:clamp(9px,1.15vh,12px);}
+.bottom{gap:6px;min-height:0;overflow:hidden;}
+.statsDock{grid-template-columns:auto minmax(0,1fr);min-height:44px;border-radius:14px;padding:7px 9px;}
+.statsTitle{font-size:9px;padding:6px 8px;}.statsText{font-size:clamp(10px,1.3vh,14px);animation:ticker 140s linear infinite;}
+.statsText span{margin-right:26px;}.ticker{height:26px;margin-inline:0;border-radius:10px;}.tickerTrack{font-size:10px;animation:ticker 180s linear infinite;}.tickerTrack span{margin-right:30px;}
+.controls{transform:scale(.85);transform-origin:top left;}
+@media (max-height:700px), (max-width:700px){.poster{transform:scale(.82)}.infoGrid{grid-template-columns:repeat(2,minmax(0,1fr));}.logoWrap{width:clamp(58px,12vh,110px);height:clamp(58px,12vh,110px)}.score{font-size:clamp(30px,8vh,76px)}}
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+
+/* ---- V4 fit + clean stats overrides ---- */
+.poster{transform:none !important;grid-template-rows:clamp(100px,15%,145px) minmax(0,1fr) clamp(150px,24%,215px) !important;padding:clamp(16px,2.6vh,30px) !important;gap:clamp(8px,1.4vh,14px) !important;}
+.matchFull{font-size:clamp(26px,5.1vh,56px) !important;line-height:.9 !important;-webkit-line-clamp:2;}
+.hero{gap:clamp(7px,1.2vh,12px) !important;}
+.teams{grid-template-columns:minmax(0,1fr) minmax(250px,46%,520px) minmax(0,1fr) !important;gap:clamp(8px,1.7vw,22px) !important;}
+.logoWrap{width:clamp(90px,17.5vh,190px) !important;height:clamp(90px,17.5vh,190px) !important;}
+.teamName{font-size:clamp(19px,2.9vh,36px) !important;line-height:.9 !important;}
+.teamRec{display:none !important;}
+.scorePair{width:100% !important;gap:8px !important;}
+.scoreTeam{border-radius:18px !important;padding:10px 8px !important;}
+.scoreLabel{font-size:clamp(13px,1.9vh,22px) !important;margin-bottom:5px !important;}
+.score{font-size:clamp(46px,10.8vh,118px) !important;line-height:.8 !important;}
+.score.sep{font-size:clamp(18px,4.2vh,44px) !important;}
+.infoGrid{gap:7px !important;}
+.card{padding:9px !important;}
+.bottom{gap:0 !important;}
+.ticker{display:none !important;}
+.statsDock{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px !important;min-height:0 !important;height:100% !important;border-radius:18px !important;padding:10px !important;overflow:hidden !important;}
+.teamStatsCard{min-width:0;border-radius:16px;padding:10px 12px;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.30));border:1px solid color-mix(in srgb,var(--teamColor),white 18%);box-shadow:inset 0 0 28px color-mix(in srgb,var(--teamColor),transparent 80%);display:grid;grid-template-rows:auto 1fr;gap:7px;overflow:hidden;}
+.teamStatsHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;font:900 clamp(11px,1.55vh,16px) Archivo,sans-serif;text-transform:uppercase;letter-spacing:.7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.teamStatsHeader b{color:var(--gold);font:900 clamp(9px,1.2vh,12px) Space Mono,monospace;letter-spacing:1.3px;}
+.teamStatsList{display:grid;gap:5px;align-content:start;overflow:hidden;}
+.statLine{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font:800 clamp(10px,1.35vh,14px) Archivo,sans-serif;color:rgba(246,241,231,.94);border-top:1px solid rgba(255,255,255,.10);padding-top:5px;min-width:0;}
+.statLine:first-child{border-top:0;padding-top:0}.statLine span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.statLine span:last-child{color:var(--gold);font-family:Space Mono,monospace;white-space:nowrap}
+@media (max-height:700px), (max-width:700px){.poster{transform:none !important;grid-template-rows:clamp(80px,14%,115px) minmax(0,1fr) clamp(126px,23%,180px) !important;padding:12px !important}.teams{grid-template-columns:minmax(0,1fr) minmax(210px,44%,430px) minmax(0,1fr)!important}.logoWrap{width:clamp(70px,14vh,135px)!important;height:clamp(70px,14vh,135px)!important}.teamName{font-size:clamp(15px,2.35vh,27px)!important}.score{font-size:clamp(34px,8.6vh,82px)!important}.scoreLabel{font-size:clamp(10px,1.45vh,16px)!important}.infoGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.card:nth-child(n+3){display:block}.statsDock{gap:6px!important;padding:7px!important}.teamStatsCard{padding:7px 8px}.statLine{font-size:clamp(9px,1.12vh,12px)}}
+
+
+/* ---- V5 clean Fire TV portrait layout ---- */
+:root{--safePad:clamp(18px,3vh,34px)}
+.bg{opacity:.9!important;background:
+ radial-gradient(circle at var(--x1,20%) var(--y1,18%), color-mix(in srgb,var(--a),transparent 40%) 0 12%, transparent 36%),
+ radial-gradient(circle at var(--x2,78%) var(--y2,72%), color-mix(in srgb,var(--b),transparent 43%) 0 13%, transparent 38%),
+ linear-gradient(var(--angle,135deg), #04060a 0%, #121824 52%, #05070b 100%)!important;}
+.bg:before{opacity:.24!important}.bg:after{opacity:.55!important}
+.logoGhost{opacity:.045!important;background-size:34% auto,34% auto!important}
+.poster{transform:none!important;padding:var(--safePad)!important;gap:clamp(8px,1.35vh,14px)!important;grid-template-rows:clamp(124px,19%,190px) minmax(0,1fr) clamp(150px,21%,220px)!important;}
+.topBar{min-height:0!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:start!important;background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,.08));border:1px solid rgba(255,255,255,.10);border-radius:24px;padding:clamp(12px,1.8vh,20px);box-shadow:0 18px 45px rgba(0,0,0,.22)}
+.matchFull{font-size:clamp(36px,6.35vh,76px)!important;line-height:.88!important;letter-spacing:.4px!important;max-width:100%!important;-webkit-line-clamp:2!important;text-shadow:0 10px 32px rgba(0,0,0,.8)!important}
+.matchFull small{font-size:clamp(10px,1.25vh,14px)!important;letter-spacing:2.4px!important;margin-bottom:7px!important;color:var(--gold)!important}
+.statusStack{min-width:max-content}.badge{font-size:clamp(12px,1.55vh,18px)!important;padding:9px 13px!important}.clock{font-size:clamp(10px,1.2vh,13px)!important}
+.hero{min-height:0!important;overflow:hidden!important;grid-template-rows:auto minmax(0,1fr) auto!important;gap:clamp(8px,1.4vh,14px)!important}
+.centerMeta{font-size:clamp(11px,1.45vh,17px)!important;letter-spacing:1.2px!important;background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:8px 14px;justify-self:center;max-width:94%}
+.teams{grid-template-columns:minmax(0,1fr) minmax(265px,45%,560px) minmax(0,1fr)!important;gap:clamp(10px,2vw,26px)!important;align-items:center!important;min-height:0!important}
+.team{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(0,0,0,.18));border:1px solid rgba(255,255,255,.10);border-radius:28px;padding:clamp(8px,1.4vh,16px);height:100%;align-content:center;box-shadow:0 14px 35px rgba(0,0,0,.18)}
+.logoWrap{width:clamp(105px,18.5vh,220px)!important;height:clamp(105px,18.5vh,220px)!important}.teamName{font-size:clamp(22px,3.15vh,42px)!important;line-height:.88!important;-webkit-line-clamp:2!important}.teamRec{display:none!important}
+.scoreBox{align-self:center;width:100%;background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:clamp(8px,1.4vh,16px);box-shadow:0 22px 55px rgba(0,0,0,.28)}
+.scorePair{width:100%!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;gap:clamp(8px,1vw,14px)!important}.scoreTeam{padding:clamp(9px,1.4vh,15px) 8px!important;border-radius:20px!important}.scoreLabel{font-size:clamp(14px,2vh,24px)!important}.score{font-size:clamp(54px,10.9vh,128px)!important;line-height:.78!important;letter-spacing:-1px!important}.scoreSub{font-size:clamp(8px,1.12vh,12px)!important}.score.sep{font-size:clamp(20px,4.6vh,54px)!important}.countdown{font-size:clamp(32px,6.8vh,72px)!important}
+.infoGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:clamp(6px,.9vh,10px)!important}.card{padding:clamp(8px,1.1vh,12px)!important;border-radius:16px!important;background:rgba(0,0,0,.30)!important}.card b{font-size:clamp(8px,.95vh,10px)!important}.card span{font-size:clamp(10px,1.25vh,14px)!important}
+.bottom{min-height:0!important}.statsDock{height:100%!important;grid-template-columns:1fr 1fr!important;gap:clamp(8px,1.1vh,12px)!important;background:rgba(0,0,0,.26)!important;border-radius:24px!important;padding:clamp(10px,1.4vh,14px)!important}.teamStatsCard{border-radius:18px!important;padding:clamp(10px,1.4vh,14px)!important}.teamStatsHeader{font-size:clamp(12px,1.6vh,17px)!important}.teamStatsHeader b{font-size:clamp(8px,1.05vh,11px)!important}.statLine{font-size:clamp(10px,1.32vh,14px)!important}
+.ticker,.dots,.slideCounter{display:none!important}.skin-2 .poster{border:0!important}.skin-11 .statusStack{position:static!important}.skin-14 .team{padding:clamp(8px,1.4vh,16px)!important}
+@media (max-height:720px),(max-width:720px){.poster{grid-template-rows:clamp(96px,18%,135px) minmax(0,1fr) clamp(132px,23%,184px)!important;padding:14px!important}.matchFull{font-size:clamp(27px,5.4vh,48px)!important}.teams{grid-template-columns:minmax(0,1fr) minmax(220px,44%,430px) minmax(0,1fr)!important;gap:8px!important}.logoWrap{width:clamp(76px,14.5vh,140px)!important;height:clamp(76px,14.5vh,140px)!important}.teamName{font-size:clamp(16px,2.55vh,28px)!important}.score{font-size:clamp(38px,8.8vh,82px)!important}.scoreLabel{font-size:clamp(10px,1.55vh,16px)!important}.infoGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.card{padding:7px!important}.statsDock{padding:7px!important;gap:7px!important}.teamStatsCard{padding:7px 8px!important}.statLine{font-size:clamp(9px,1.1vh,12px)!important}.clock{display:none!important}}
+
+
+
+/* ---- V5 cleaner readable portrait display ---- */
+.poster{
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  padding:clamp(18px,3.1vh,34px) !important;
+  gap:clamp(8px,1.35vh,14px) !important;
+}
+.topBar{
+  min-height:0 !important;
+  grid-template-columns:1fr auto !important;
+  align-items:center !important;
+  padding:0 4px !important;
+}
+.matchFull{
+  max-width:100% !important;
+  font-family:Space Mono,monospace !important;
+  font-size:clamp(12px,1.6vh,18px) !important;
+  line-height:1.15 !important;
+  letter-spacing:2px !important;
+  color:rgba(246,241,231,.80) !important;
+  text-shadow:none !important;
+  text-transform:uppercase !important;
+}
+.matchFull small{display:none !important;}
+.statusStack{gap:6px !important;}
+.badge{font-size:clamp(12px,1.7vh,20px) !important;padding:8px 14px !important;}
+.clock{font-size:clamp(9px,1.1vh,12px) !important;padding:5px 8px !important;}
+.hero{
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:clamp(8px,1.25vh,16px) !important;
+  min-height:0 !important;
+}
+.gameTitleCenter{
+  width:100%;
+  text-align:center;
+  font-family:Bebas Neue,Impact,sans-serif;
+  font-size:clamp(48px,8.6vh,112px);
+  line-height:.88;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#fff;
+  text-wrap:balance;
+  text-shadow:0 10px 34px rgba(0,0,0,.8), 0 0 32px color-mix(in srgb,var(--a),transparent 45%);
+  margin:0 auto;
+  max-width:98%;
+}
+.gameTitleCenter .vsWord{
+  color:var(--gold);
+  padding:0 .16em;
+  text-shadow:0 0 24px color-mix(in srgb,var(--gold),transparent 20%);
+}
+.centerMeta{
+  font-size:clamp(14px,2.1vh,24px) !important;
+  letter-spacing:1.3px !important;
+  color:rgba(246,241,231,.92) !important;
+}
+.teams{
+  grid-template-columns:minmax(0,1fr) minmax(240px,42%,520px) minmax(0,1fr) !important;
+  gap:clamp(8px,1.7vw,22px) !important;
+  align-items:center !important;
+  min-height:0 !important;
+}
+.logoWrap{
+  width:clamp(95px,18vh,210px) !important;
+  height:clamp(95px,18vh,210px) !important;
+}
+.teamName{
+  font-size:clamp(22px,3.35vh,46px) !important;
+  line-height:.95 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+.teamRec{display:none !important;}
+.scorePair{
+  width:100% !important;
+  max-width:520px !important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) !important;
+  gap:10px !important;
+}
+.scoreTeam{
+  border-radius:22px !important;
+  padding:clamp(10px,1.35vh,16px) clamp(8px,1.2vw,14px) !important;
+}
+.scoreLabel{font-size:clamp(14px,2.05vh,25px) !important;line-height:1 !important;}
+.score{font-size:clamp(56px,11.5vh,142px) !important;line-height:.82 !important;letter-spacing:-2px !important;}
+.scoreSub{font-size:clamp(9px,1.15vh,13px) !important;}
+.infoGrid{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:8px !important;
+}
+.card{padding:clamp(8px,1.1vh,12px) !important;border-radius:16px !important;}
+.card b{font-size:clamp(8px,1vh,11px) !important;}
+.card span{font-size:clamp(10px,1.35vh,15px) !important;}
+.bottom{min-height:0 !important;}
+.statsDock{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:clamp(10px,1.4vh,16px) !important;
+  height:auto !important;
+  min-height:clamp(145px,21vh,230px) !important;
+  background:rgba(0,0,0,.20) !important;
+  border:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+.teamStatsCard{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--teamColor),transparent 72%),rgba(0,0,0,.38)) !important;
+  border:1px solid color-mix(in srgb,var(--teamColor),white 24%) !important;
+  border-radius:22px !important;
+  padding:clamp(12px,1.65vh,18px) !important;
+  overflow:hidden !important;
+  box-shadow:0 16px 34px rgba(0,0,0,.22), inset 0 0 36px color-mix(in srgb,var(--teamColor),transparent 86%) !important;
+}
+.teamStatsHeader{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-bottom:8px !important;
+  font:900 clamp(15px,2.05vh,23px) Archivo,sans-serif !important;
+  color:#fff !important;
+  text-transform:uppercase !important;
+}
+.teamStatsHeader b{
+  font:900 clamp(8px,1.1vh,11px) Space Mono,monospace !important;
+  color:#101216 !important;
+  background:var(--gold) !important;
+  border-radius:999px !important;
+  padding:5px 8px !important;
+  white-space:nowrap !important;
+}
+.teamStatsList{display:grid !important;gap:6px !important;}
+.statLine{
+  display:grid !important;
+  grid-template-columns:1fr auto !important;
+  gap:8px !important;
+  align-items:center !important;
+  padding:6px 0 !important;
+  border-top:1px solid rgba(255,255,255,.10) !important;
+  font:800 clamp(11px,1.45vh,16px) Archivo,sans-serif !important;
+}
+.statLine:first-child{border-top:0 !important;}
+.statLine span:first-child{color:rgba(246,241,231,.74) !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.statLine span:last-child{color:#fff !important;text-align:right !important;font-weight:900 !important;white-space:nowrap;}
+@media (max-height:720px),(max-width:720px){
+  .poster{padding:12px !important;gap:7px !important;}
+  .hero{gap:7px !important;}
+  .gameTitleCenter{font-size:clamp(36px,7.2vh,72px) !important;}
+  .centerMeta{font-size:clamp(11px,1.7vh,17px) !important;}
+  .teams{grid-template-columns:minmax(0,1fr) minmax(210px,42%,430px) minmax(0,1fr)!important;gap:7px!important;}
+  .logoWrap{width:clamp(70px,14vh,130px)!important;height:clamp(70px,14vh,130px)!important;}
+  .teamName{font-size:clamp(15px,2.35vh,26px)!important;}
+  .score{font-size:clamp(40px,8.5vh,86px)!important;}
+  .scoreLabel{font-size:clamp(10px,1.5vh,16px)!important;}
+  .infoGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .card:nth-child(n+3){display:block !important;}
+  .statsDock{min-height:clamp(118px,20vh,160px)!important;gap:7px!important;}
+  .teamStatsCard{padding:8px!important;border-radius:16px!important;}
+  .teamStatsHeader{font-size:clamp(11px,1.55vh,15px)!important;margin-bottom:4px!important;}
+  .teamStatsHeader b{font-size:7px!important;padding:4px 6px!important;}
+  .statLine{font-size:clamp(9px,1.12vh,12px)!important;padding:4px 0!important;}
+}
+
+
+.flipBtn{
+position:fixed;top:12px;right:12px;z-index:9999;
+padding:10px 14px;border-radius:10px;border:1px solid #666;
+background:#222;color:#fff;font-weight:700;cursor:pointer;
+}
+.rotated{
+transform:rotate(180deg);
+transform-origin:center center;
+width:100vw;height:100vh;
+}
+
+</style>
+
+<style>
+/* =========================================================
+   PORTRAIT LAYOUT UPDATE — EXPANDED CENTER GAME AREA
+   Keeps the header compact, makes logos/scores much larger,
+   and preserves the bottom statistics section.
+   ========================================================= */
+
+.poster{
+  grid-template-rows: 11% minmax(0, 65%) 24% !important;
+  padding: clamp(14px, 2.3vh, 26px) !important;
+  gap: clamp(7px, 1.1vh, 12px) !important;
+}
+
+/* Compact top bar so the matchup area gets more height */
+.topBar{
+  min-height: 0 !important;
+  height: 100% !important;
+  padding: 0 4px !important;
+  align-items: center !important;
+}
+
+.matchFull{
+  font-size: clamp(11px, 1.45vh, 17px) !important;
+  line-height: 1.1 !important;
+}
+
+.badge{
+  font-size: clamp(11px, 1.45vh, 17px) !important;
+  padding: 7px 12px !important;
+}
+
+.clock{
+  font-size: clamp(8px, 1vh, 11px) !important;
+  padding: 4px 7px !important;
+}
+
+/* Main middle section */
+.hero{
+  min-height: 0 !important;
+  height: 100% !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: clamp(8px, 1.5vh, 17px) !important;
+  overflow: hidden !important;
+}
+
+.gameTitleCenter{
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: clamp(44px, 8.1vh, 108px) !important;
+  line-height: .86 !important;
+  margin: 0 auto !important;
+}
+
+.centerMeta{
+  font-size: clamp(12px, 1.75vh, 21px) !important;
+  padding: 7px 14px !important;
+  max-width: 96% !important;
+}
+
+/* More room for logos and center scoreboard */
+.teams{
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(360px, 56%)
+    minmax(0, 1fr) !important;
+  gap: clamp(12px, 2vw, 30px) !important;
+  align-items: center !important;
+}
+
+/* Taller team panels */
+.team{
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: clamp(10px, 1.5vh, 18px) !important;
+  align-content: center !important;
+  gap: clamp(7px, 1.1vh, 13px) !important;
+}
+
+/* Larger team logos */
+.logoWrap{
+  width: clamp(125px, 23vh, 285px) !important;
+  height: clamp(125px, 23vh, 285px) !important;
+}
+
+.teamName{
+  font-size: clamp(24px, 3.75vh, 52px) !important;
+  line-height: .9 !important;
+  max-width: 100% !important;
+}
+
+/* Bigger center score display */
+.scoreBox{
+  width: 100% !important;
+  min-height: 0 !important;
+  padding: clamp(13px, 2vh, 24px) !important;
+  border-radius: 32px !important;
+}
+
+.scorePair{
+  width: 100% !important;
+  max-width: 760px !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr) !important;
+  gap: clamp(10px, 1.3vw, 18px) !important;
+}
+
+.scoreTeam{
+  padding: clamp(15px, 2.2vh, 27px) clamp(10px, 1.4vw, 18px) !important;
+  border-radius: 27px !important;
+}
+
+.scoreLabel{
+  font-size: clamp(17px, 2.65vh, 32px) !important;
+  margin-bottom: 8px !important;
+}
+
+.score{
+  font-size: clamp(78px, 15.5vh, 190px) !important;
+  line-height: .76 !important;
+  letter-spacing: -3px !important;
+}
+
+.score.sep{
+  font-size: clamp(26px, 5.5vh, 68px) !important;
+}
+
+.scoreSub{
+  font-size: clamp(9px, 1.25vh, 14px) !important;
+  margin-top: 8px !important;
+}
+
+.countdown{
+  font-size: clamp(48px, 9vh, 104px) !important;
+}
+
+/* Keep info cards readable but compact */
+.infoGrid{
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+.card{
+  padding: clamp(7px, .95vh, 10px) !important;
+  border-radius: 14px !important;
+}
+
+.card b{
+  font-size: clamp(7px, .9vh, 9px) !important;
+}
+
+.card span{
+  font-size: clamp(9px, 1.18vh, 13px) !important;
+}
+
+/* Bottom stats remain visible without taking over the display */
+.bottom{
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.statsDock{
+  height: 100% !important;
+  min-height: 0 !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: clamp(8px, 1.15vh, 13px) !important;
+}
+
+.teamStatsCard{
+  min-height: 0 !important;
+  padding: clamp(9px, 1.3vh, 14px) !important;
+  border-radius: 18px !important;
+}
+
+.teamStatsHeader{
+  font-size: clamp(12px, 1.65vh, 18px) !important;
+  margin-bottom: 5px !important;
+}
+
+.statLine{
+  padding: 4px 0 !important;
+  font-size: clamp(9px, 1.2vh, 13px) !important;
+}
+
+/* Smaller portrait screens / lower-resolution Fire TVs */
+@media (max-height: 760px), (max-width: 760px){
+  .poster{
+    grid-template-rows: 10% minmax(0, 67%) 23% !important;
+    padding: 10px !important;
+    gap: 6px !important;
+  }
+
+  .gameTitleCenter{
+    font-size: clamp(32px, 6.7vh, 64px) !important;
+  }
+
+  .centerMeta{
+    font-size: clamp(9px, 1.4vh, 14px) !important;
+    padding: 5px 9px !important;
+  }
+
+  .teams{
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(250px, 52%)
+      minmax(0, 1fr) !important;
+    gap: 7px !important;
+  }
+
+  .team{
+    padding: 7px !important;
+    border-radius: 18px !important;
+  }
+
+  .logoWrap{
+    width: clamp(82px, 16vh, 155px) !important;
+    height: clamp(82px, 16vh, 155px) !important;
+  }
+
+  .teamName{
+    font-size: clamp(16px, 2.6vh, 29px) !important;
+  }
+
+  .scoreBox{
+    padding: 8px !important;
+    border-radius: 20px !important;
+  }
+
+  .scoreTeam{
+    padding: 10px 6px !important;
+    border-radius: 16px !important;
+  }
+
+  .scoreLabel{
+    font-size: clamp(10px, 1.7vh, 17px) !important;
+  }
+
+  .score{
+    font-size: clamp(48px, 10.5vh, 98px) !important;
+  }
+
+  .score.sep{
+    font-size: clamp(18px, 4vh, 38px) !important;
+  }
+
+  .infoGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  .card{
+    padding: 5px 6px !important;
+  }
+
+  .statsDock{
+    gap: 6px !important;
+  }
+
+  .teamStatsCard{
+    padding: 6px 7px !important;
+    border-radius: 14px !important;
+  }
+
+  .teamStatsHeader{
+    font-size: clamp(10px, 1.4vh, 14px) !important;
+  }
+
+  .statLine{
+    font-size: clamp(8px, 1vh, 11px) !important;
+    padding: 3px 0 !important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   TEAM-COLOR PORTRAIT DESIGN
+   - Top title is only TEAM A VS TEAM B
+   - Each team name uses its official team color
+   - Main matchup and logos are larger
+   - Venue / broadcast / game time / game info cards are larger
+   ========================================================= */
+
+.gameTitleCenter{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:clamp(12px,2.2vw,32px) !important;
+  width:100% !important;
+  padding:clamp(8px,1.3vh,15px) clamp(12px,1.6vw,22px) !important;
+  border-radius:24px !important;
+  background:linear-gradient(90deg,
+    color-mix(in srgb,var(--a),transparent 75%),
+    rgba(0,0,0,.30) 42%,
+    rgba(0,0,0,.30) 58%,
+    color-mix(in srgb,var(--b),transparent 75%)
+  ) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.28) !important;
+  font-size:inherit !important;
+  line-height:1 !important;
+  text-shadow:none !important;
+}
+
+.titleTeam{
+  min-width:0;
+  color:var(--titleColor);
+  font-family:Bebas Neue,Impact,sans-serif;
+  font-size:clamp(47px,8.5vh,118px);
+  line-height:.84;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  text-shadow:
+    0 8px 25px rgba(0,0,0,.82),
+    0 0 22px color-mix(in srgb,var(--titleColor),transparent 38%);
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.titleAway{text-align:right}
+.titleHome{text-align:left}
+
+.vsWord{
+  color:#fff !important;
+  font-family:Space Mono,monospace !important;
+  font-size:clamp(18px,3.2vh,40px) !important;
+  font-weight:900 !important;
+  letter-spacing:2px !important;
+  padding:10px 12px !important;
+  border-radius:999px !important;
+  background:rgba(0,0,0,.58) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  text-shadow:none !important;
+}
+
+/* Make the primary matchup occupy more of the portrait screen */
+.hero{
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+
+.teams{
+  grid-template-columns:minmax(0,1.08fr) minmax(390px,52%) minmax(0,1.08fr) !important;
+  gap:clamp(12px,2.2vw,34px) !important;
+}
+
+.team{
+  padding:clamp(12px,1.9vh,22px) !important;
+  border-radius:30px !important;
+}
+
+.logoWrap{
+  width:clamp(145px,26vh,330px) !important;
+  height:clamp(145px,26vh,330px) !important;
+}
+
+.teamLogo{
+  max-width:112% !important;
+  max-height:112% !important;
+}
+
+.teamName{
+  font-size:clamp(27px,4.2vh,58px) !important;
+}
+
+/* Extra logo room for long/wide marks such as Arizona */
+.team:nth-child(1) .logoWrap,
+.team:nth-child(3) .logoWrap{
+  overflow:visible !important;
+}
+
+.scoreBox{
+  padding:clamp(17px,2.5vh,30px) !important;
+  border-radius:36px !important;
+}
+
+.score{
+  font-size:clamp(86px,17vh,210px) !important;
+}
+
+.scoreLabel{
+  font-size:clamp(19px,2.9vh,36px) !important;
+}
+
+/* Larger game information strip */
+.infoGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:clamp(8px,1.2vh,13px) !important;
+}
+
+.card{
+  min-height:clamp(62px,8.5vh,96px) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  padding:clamp(11px,1.55vh,17px) !important;
+  border-radius:19px !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.35)) !important;
+  border:1px solid rgba(255,255,255,.15) !important;
+}
+
+.card b{
+  font-size:clamp(9px,1.15vh,13px) !important;
+  margin-bottom:5px !important;
+}
+
+.card span{
+  font-size:clamp(13px,1.85vh,21px) !important;
+  white-space:normal !important;
+  line-height:1.12 !important;
+}
+
+/* Keep stats readable while giving the center priority */
+.poster{
+  grid-template-rows:9% minmax(0,69%) 22% !important;
+}
+
+.statsDock{
+  gap:10px !important;
+}
+
+@media (max-height:760px),(max-width:760px){
+  .poster{
+    grid-template-rows:8% minmax(0,70%) 22% !important;
+  }
+
+  .gameTitleCenter{
+    gap:7px !important;
+    padding:6px 8px !important;
+    border-radius:16px !important;
+  }
+
+  .titleTeam{
+    font-size:clamp(29px,6.2vh,61px) !important;
+  }
+
+  .vsWord{
+    font-size:clamp(11px,2.1vh,20px) !important;
+    padding:6px 7px !important;
+  }
+
+  .teams{
+    grid-template-columns:minmax(0,1fr) minmax(270px,50%) minmax(0,1fr) !important;
+    gap:7px !important;
+  }
+
+  .logoWrap{
+    width:clamp(96px,19vh,190px) !important;
+    height:clamp(96px,19vh,190px) !important;
+  }
+
+  .teamName{
+    font-size:clamp(18px,3vh,32px) !important;
+  }
+
+  .score{
+    font-size:clamp(55px,12vh,114px) !important;
+  }
+
+  .scoreLabel{
+    font-size:clamp(11px,1.9vh,19px) !important;
+  }
+
+  .infoGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+  }
+
+  .card{
+    min-height:48px !important;
+    padding:6px 7px !important;
+    border-radius:12px !important;
+  }
+
+  .card b{
+    font-size:7px !important;
+    margin-bottom:2px !important;
+  }
+
+  .card span{
+    font-size:clamp(9px,1.25vh,12px) !important;
+  }
+}
+</style>
+
+
+<style>
+/* Next-24-hours selection controls */
+.windowChips{
+  padding:10px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:16px;
+  background:rgba(0,0,0,.20);
+}
+
+.windowChips .chip{
+  min-height:42px;
+  padding:10px 15px;
+}
+
+.windowChips .chip[data-window="next24"]{
+  border-color:color-mix(in srgb,var(--gold),transparent 35%);
+}
+
+.windowChips .chip[data-window="next24"].on{
+  background:linear-gradient(135deg,var(--gold),#ffe39a);
+  color:#111;
+  box-shadow:0 8px 22px color-mix(in srgb,var(--gold),transparent 68%);
+}
+
+@media(max-width:720px),(max-height:720px){
+  .windowChips{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+
+  .windowChips .chip{
+    width:100%;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   VERTICAL FULL-PAGE LAYOUT
+   Uses nearly every pixel of the rotated portrait display.
+   Text, logos, score, information cards, and stats scale to
+   fill the screen without leaving large empty areas.
+   ========================================================= */
+
+:root{
+  --pagePad:clamp(10px,1.8vh,22px);
+  --pageGap:clamp(6px,1vh,12px);
+}
+
+/* Use all available portrait space */
+.poster{
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  padding:var(--pagePad) !important;
+  gap:var(--pageGap) !important;
+  grid-template-rows:
+    minmax(48px,7%)
+    minmax(0,70%)
+    minmax(0,23%) !important;
+  overflow:hidden !important;
+}
+
+/* Small, efficient header */
+.topBar{
+  height:100% !important;
+  min-height:0 !important;
+  padding:0 clamp(4px,.7vw,10px) !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:8px !important;
+  background:rgba(0,0,0,.24) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-radius:16px !important;
+}
+
+.matchFull{
+  max-width:100% !important;
+  font-size:clamp(11px,1.55vh,18px) !important;
+  line-height:1 !important;
+  letter-spacing:1.5px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.statusStack{
+  align-self:center !important;
+}
+
+.clock{
+  font-size:clamp(8px,1.05vh,12px) !important;
+}
+
+/* Main game area fills the middle */
+.hero{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  display:grid !important;
+  grid-template-rows:
+    minmax(68px,17%)
+    minmax(30px,7%)
+    minmax(0,58%)
+    minmax(78px,18%) !important;
+  gap:clamp(5px,.85vh,10px) !important;
+  align-items:stretch !important;
+}
+
+/* Team A VS Team B title */
+.gameTitleCenter{
+  height:100% !important;
+  min-height:0 !important;
+  padding:clamp(5px,.9vh,11px) clamp(8px,1.2vw,16px) !important;
+  border-radius:18px !important;
+  gap:clamp(7px,1.2vw,18px) !important;
+}
+
+.titleTeam{
+  font-size:clamp(34px,7.3vh,94px) !important;
+  line-height:.82 !important;
+  display:flex !important;
+  align-items:center !important;
+  min-height:0 !important;
+}
+
+.titleAway{justify-content:flex-end}
+.titleHome{justify-content:flex-start}
+
+.vsWord{
+  font-size:clamp(13px,2.5vh,30px) !important;
+  padding:clamp(5px,.7vh,9px) clamp(7px,.8vw,11px) !important;
+}
+
+/* Compact status line */
+.centerMeta{
+  align-self:center !important;
+  justify-self:center !important;
+  width:auto !important;
+  max-width:98% !important;
+  padding:clamp(4px,.55vh,7px) clamp(9px,1.3vw,15px) !important;
+  font-size:clamp(10px,1.5vh,17px) !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* Biggest part of the display: teams + score */
+.teams{
+  height:100% !important;
+  min-height:0 !important;
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(330px,54%)
+    minmax(0,1fr) !important;
+  gap:clamp(7px,1.25vw,18px) !important;
+  align-items:stretch !important;
+}
+
+.team{
+  height:100% !important;
+  min-height:0 !important;
+  padding:clamp(5px,.85vh,11px) !important;
+  border-radius:22px !important;
+  display:grid !important;
+  grid-template-rows:minmax(0,1fr) auto !important;
+  align-content:stretch !important;
+  gap:clamp(3px,.55vh,7px) !important;
+}
+
+.logoWrap{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+
+.teamLogo{
+  max-width:116% !important;
+  max-height:116% !important;
+}
+
+.logoFallback{
+  inset:3% !important;
+}
+
+.teamName{
+  font-size:clamp(19px,3.25vh,42px) !important;
+  line-height:.86 !important;
+  min-height:0 !important;
+  margin:0 !important;
+}
+
+/* Score fills its complete center panel */
+.scoreBox{
+  height:100% !important;
+  min-height:0 !important;
+  padding:clamp(7px,1.05vh,13px) !important;
+  border-radius:25px !important;
+  display:grid !important;
+  place-items:stretch !important;
+}
+
+.scorePair{
+  height:100% !important;
+  max-width:none !important;
+  align-items:stretch !important;
+  gap:clamp(5px,.8vw,10px) !important;
+}
+
+.scoreTeam{
+  min-height:0 !important;
+  padding:clamp(7px,1.1vh,14px) clamp(5px,.7vw,9px) !important;
+  border-radius:18px !important;
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  align-items:center !important;
+}
+
+.scoreLabel{
+  font-size:clamp(12px,2vh,24px) !important;
+  line-height:1 !important;
+  margin:0 !important;
+}
+
+.score{
+  align-self:center !important;
+  font-size:clamp(66px,15vh,180px) !important;
+  line-height:.72 !important;
+}
+
+.score.sep{
+  align-self:center !important;
+  font-size:clamp(19px,4.2vh,49px) !important;
+}
+
+.scoreSub{
+  font-size:clamp(7px,.95vh,11px) !important;
+  margin:0 !important;
+}
+
+.countdown{
+  align-self:center !important;
+  font-size:clamp(37px,7.5vh,88px) !important;
+  line-height:.95 !important;
+}
+
+/* Four large information blocks fill the final row of hero */
+.infoGrid{
+  height:100% !important;
+  min-height:0 !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+  gap:clamp(5px,.75vh,9px) !important;
+}
+
+.card{
+  height:100% !important;
+  min-height:0 !important;
+  padding:clamp(6px,.85vh,10px) clamp(8px,1vw,12px) !important;
+  border-radius:14px !important;
+  justify-content:center !important;
+}
+
+.card b{
+  font-size:clamp(7px,.9vh,10px) !important;
+  margin-bottom:clamp(2px,.35vh,4px) !important;
+}
+
+.card span{
+  font-size:clamp(11px,1.55vh,18px) !important;
+  line-height:1.05 !important;
+  display:-webkit-box !important;
+  -webkit-line-clamp:2 !important;
+  -webkit-box-orient:vertical !important;
+  overflow:hidden !important;
+}
+
+/* Bottom stats use the entire remaining area */
+.bottom{
+  height:100% !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+
+.statsDock{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  padding:0 !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:clamp(6px,.85vh,10px) !important;
+  overflow:hidden !important;
+}
+
+.teamStatsCard{
+  height:100% !important;
+  min-height:0 !important;
+  padding:clamp(7px,1vh,12px) !important;
+  border-radius:17px !important;
+  grid-template-rows:auto minmax(0,1fr) !important;
+  gap:clamp(3px,.45vh,6px) !important;
+}
+
+.teamStatsHeader{
+  font-size:clamp(11px,1.55vh,18px) !important;
+  line-height:1 !important;
+  margin:0 !important;
+}
+
+.teamStatsHeader b{
+  font-size:clamp(6px,.8vh,9px) !important;
+  padding:4px 6px !important;
+}
+
+.teamStatsList{
+  min-height:0 !important;
+  height:100% !important;
+  display:grid !important;
+  grid-template-rows:repeat(4,minmax(0,1fr)) !important;
+  gap:0 !important;
+  align-content:stretch !important;
+}
+
+.statLine{
+  min-height:0 !important;
+  padding:clamp(2px,.35vh,4px) 0 !important;
+  font-size:clamp(8px,1.12vh,13px) !important;
+  line-height:1 !important;
+}
+
+/* Controls stay accessible but do not cover the display */
+.controls{
+  top:7px !important;
+  left:7px !important;
+  gap:5px !important;
+  transform:scale(.72) !important;
+  transform-origin:top left !important;
+}
+
+/* Extra tuning for short or low-resolution portrait screens */
+@media(max-height:720px),(max-width:720px){
+  :root{
+    --pagePad:8px;
+    --pageGap:5px;
+  }
+
+  .poster{
+    grid-template-rows:7% minmax(0,71%) minmax(0,22%) !important;
+  }
+
+  .hero{
+    grid-template-rows:16% 7% 58% 19% !important;
+    gap:4px !important;
+  }
+
+  .titleTeam{
+    font-size:clamp(25px,5.9vh,57px) !important;
+  }
+
+  .vsWord{
+    font-size:clamp(9px,1.8vh,16px) !important;
+    padding:4px 5px !important;
+  }
+
+  .teams{
+    grid-template-columns:minmax(0,1fr) minmax(235px,51%) minmax(0,1fr) !important;
+    gap:5px !important;
+  }
+
+  .team{
+    padding:4px !important;
+    border-radius:14px !important;
+  }
+
+  .teamName{
+    font-size:clamp(13px,2.3vh,23px) !important;
+  }
+
+  .scoreBox{
+    padding:5px !important;
+    border-radius:16px !important;
+  }
+
+  .scoreTeam{
+    padding:5px 3px !important;
+    border-radius:12px !important;
+  }
+
+  .score{
+    font-size:clamp(43px,10.2vh,96px) !important;
+  }
+
+  .scoreLabel{
+    font-size:clamp(8px,1.35vh,13px) !important;
+  }
+
+  .scoreSub{
+    font-size:6px !important;
+  }
+
+  .centerMeta{
+    font-size:clamp(8px,1.15vh,11px) !important;
+    padding:3px 7px !important;
+  }
+
+  .card{
+    padding:4px 6px !important;
+    border-radius:9px !important;
+  }
+
+  .card b{
+    font-size:6px !important;
+  }
+
+  .card span{
+    font-size:clamp(8px,1.05vh,10px) !important;
+  }
+
+  .teamStatsCard{
+    padding:5px 6px !important;
+    border-radius:11px !important;
+  }
+
+  .teamStatsHeader{
+    font-size:clamp(8px,1.15vh,11px) !important;
+  }
+
+  .statLine{
+    font-size:clamp(7px,.9vh,9px) !important;
+    padding:2px 0 !important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   TEAM LOGOS + HIGH-CONTRAST TEXT
+   Prevents labels, scores, and statistics from blending into
+   bright or similarly colored team backgrounds.
+   ========================================================= */
+
+/* Darker overlay behind all primary content */
+.poster{
+  background:
+    linear-gradient(180deg,rgba(2,4,8,.20),rgba(2,4,8,.34)) !important;
+}
+
+.bg{
+  filter:brightness(.66) saturate(1.08) !important;
+}
+
+.logoGhost{
+  opacity:.025 !important;
+}
+
+/* Top matchup row with logos */
+.gameTitleCenter{
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb,var(--a),#05070b 72%),
+      rgba(3,5,9,.96) 41%,
+      rgba(3,5,9,.96) 59%,
+      color-mix(in srgb,var(--b),#05070b 72%)
+    ) !important;
+  border:2px solid rgba(255,255,255,.20) !important;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.55),
+    inset 0 0 0 1px rgba(0,0,0,.45) !important;
+}
+
+.titleSide{
+  min-width:0;
+  display:grid;
+  align-items:center;
+  gap:clamp(7px,1vw,14px);
+}
+
+.titleSideAway{
+  grid-template-columns:minmax(0,1fr) auto;
+}
+
+.titleSideHome{
+  grid-template-columns:auto minmax(0,1fr);
+}
+
+.titleLogoWrap{
+  position:relative;
+  width:clamp(45px,7.5vh,88px);
+  height:clamp(45px,7.5vh,88px);
+  flex:none;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  padding:5px;
+  background:rgba(255,255,255,.96);
+  border:3px solid color-mix(in srgb,var(--titleColor),white 18%);
+  box-shadow:0 7px 18px rgba(0,0,0,.65);
+  overflow:hidden;
+}
+
+.titleLogo{
+  position:relative;
+  z-index:2;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.titleLogo.broken,
+.titleLogo[src=""]{
+  display:none;
+}
+
+.titleLogoFallback{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--titleColor),#111827);
+  font:900 clamp(10px,1.7vh,18px) Archivo,sans-serif;
+}
+
+.titleTeam{
+  color:#fff !important;
+  -webkit-text-stroke:1px rgba(0,0,0,.78);
+  text-shadow:
+    0 3px 0 rgba(0,0,0,.92),
+    0 7px 18px rgba(0,0,0,.92),
+    0 0 15px var(--titleColor) !important;
+}
+
+.titleAway{text-align:right}
+.titleHome{text-align:left}
+
+.vsWord{
+  color:#fff !important;
+  background:#02040a !important;
+  border:2px solid rgba(255,255,255,.34) !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.75) !important;
+}
+
+/* Make every panel visibly separate from the animated background */
+.topBar,
+.team,
+.scoreBox,
+.card,
+.teamStatsCard,
+.centerMeta{
+  background-color:rgba(4,7,13,.90) !important;
+  border-color:rgba(255,255,255,.22) !important;
+  box-shadow:
+    0 9px 22px rgba(0,0,0,.52),
+    inset 0 0 0 1px rgba(0,0,0,.32) !important;
+  backdrop-filter:none !important;
+}
+
+/* Preserve a subtle team-color accent without hurting readability */
+.team:first-child{
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,var(--a),transparent 83%),
+      rgba(4,7,13,.95) 38%
+    ) !important;
+  border-color:color-mix(in srgb,var(--a),white 28%) !important;
+}
+
+.team:nth-child(3){
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,var(--b),transparent 83%),
+      rgba(4,7,13,.95) 38%
+    ) !important;
+  border-color:color-mix(in srgb,var(--b),white 28%) !important;
+}
+
+.scoreBox{
+  background:rgba(2,5,10,.94) !important;
+}
+
+.scoreTeam{
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,var(--teamScoreColor),transparent 76%),
+      rgba(3,6,11,.96)
+    ) !important;
+  border-width:2px !important;
+}
+
+/* Strong text contrast everywhere */
+.teamName,
+.score,
+.scoreLabel,
+.scoreSub,
+.centerMeta,
+.card span,
+.teamStatsHeader,
+.statLine span,
+.matchFull,
+.clock{
+  color:#fff !important;
+  text-shadow:
+    0 2px 2px rgba(0,0,0,1),
+    0 4px 10px rgba(0,0,0,.92) !important;
+}
+
+.score{
+  -webkit-text-stroke:2px rgba(0,0,0,.65);
+}
+
+.card b,
+.teamStatsHeader b{
+  text-shadow:none !important;
+}
+
+.card{
+  background:rgba(4,7,13,.94) !important;
+}
+
+.card b{
+  color:#ffd96a !important;
+}
+
+.card span{
+  font-weight:800 !important;
+}
+
+.teamStatsCard{
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb,var(--teamColor),transparent 80%),
+      rgba(3,6,11,.97) 42%
+    ) !important;
+}
+
+.statLine span:first-child{
+  color:#d9e0ea !important;
+}
+
+.statLine span:last-child{
+  color:#fff !important;
+  font-weight:900 !important;
+}
+
+/* Logos sit on a light disk so dark logos remain visible */
+.logoWrap{
+  border-radius:28px;
+  background:radial-gradient(circle,rgba(255,255,255,.96) 0 55%,rgba(255,255,255,.12) 56%,transparent 72%);
+}
+
+.teamLogo{
+  filter:
+    drop-shadow(0 5px 2px rgba(0,0,0,.46))
+    drop-shadow(0 12px 18px rgba(0,0,0,.65)) !important;
+}
+
+/* Management panel contrast */
+.panel{
+  background:#080d17 !important;
+  border:2px solid rgba(255,255,255,.22) !important;
+  box-shadow:0 22px 70px rgba(0,0,0,.78) !important;
+}
+
+.gameRow{
+  background:rgba(255,255,255,.055) !important;
+}
+
+@media(max-height:720px),(max-width:720px){
+  .titleSide{
+    gap:4px;
+  }
+
+  .titleLogoWrap{
+    width:clamp(32px,5.8vh,54px);
+    height:clamp(32px,5.8vh,54px);
+    padding:3px;
+    border-width:2px;
+  }
+
+  .titleTeam{
+    -webkit-text-stroke:.6px rgba(0,0,0,.85);
+  }
+
+  .score{
+    -webkit-text-stroke:1px rgba(0,0,0,.72);
+  }
+}
+</style>
+
+
+<style>
+/* Automatic game-fill controls */
+.autoFillBox{
+  margin:14px 0;
+  padding:14px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,214,102,.10),rgba(255,255,255,.035));
+  border:1px solid rgba(255,214,102,.34);
+}
+
+.autoFillHeading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.autoFillHeading strong{
+  display:block;
+  color:#fff;
+  font-size:17px;
+}
+
+.autoFillHeading small{
+  display:block;
+  margin-top:3px;
+  color:#bfc7d3;
+}
+
+.autoFillToggle{
+  flex:none;
+  min-width:132px;
+  padding:10px 13px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.22);
+  background:#222936;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.autoFillToggle.on{
+  color:#101318;
+  background:linear-gradient(135deg,#ffd766,#fff0a7);
+  border-color:#ffe18b;
+}
+
+.autoFillLeagueGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.autoLeague{
+  min-height:43px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.15);
+  background:#111722;
+  color:#dce3ed;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.autoLeague span{
+  margin-right:5px;
+}
+
+.autoLeague.on{
+  background:#f3f6fb;
+  color:#11151c;
+  border-color:#fff;
+  box-shadow:0 5px 15px rgba(0,0,0,.30);
+}
+
+.autoFillActions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:11px;
+}
+
+.autoFillActions label{
+  color:#d7dee8;
+  font-size:13px;
+  font-weight:700;
+}
+
+.autoFillActions select{
+  margin-left:7px;
+  padding:8px 9px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.20);
+  background:#0c111b;
+  color:#fff;
+}
+
+.autoNow{
+  background:linear-gradient(135deg,#ffd766,#fff0a7) !important;
+  color:#111 !important;
+  border-color:#ffe18b !important;
+}
+
+@media(max-width:650px){
+  .autoFillHeading,
+  .autoFillActions{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .autoFillToggle,
+  .autoNow{
+    width:100%;
+  }
+
+  .autoFillLeagueGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   TEXT-FOCUSED PORTRAIT LAYOUT
+   Removes the top logo row and makes all text use the full
+   height and width of each panel for much easier reading.
+   ========================================================= */
+
+/* Text-only matchup title */
+.gameTitleCenter{
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) !important;
+}
+
+.titleTeam{
+  width:100%;
+  height:100%;
+  display:flex !important;
+  align-items:center !important;
+  color:#fff !important;
+  font-size:clamp(38px,8.2vh,104px) !important;
+  line-height:.78 !important;
+  padding:0 clamp(4px,.5vw,8px);
+  -webkit-text-stroke:1px rgba(0,0,0,.85);
+  text-shadow:
+    0 3px 0 #000,
+    0 7px 18px rgba(0,0,0,.95),
+    0 0 15px var(--titleColor) !important;
+}
+
+.titleAway{
+  justify-content:flex-end !important;
+  text-align:right !important;
+}
+
+.titleHome{
+  justify-content:flex-start !important;
+  text-align:left !important;
+}
+
+/* Give more of the screen to readable information */
+.poster{
+  grid-template-rows:
+    minmax(44px,6%)
+    minmax(0,66%)
+    minmax(0,28%) !important;
+}
+
+.hero{
+  grid-template-rows:
+    minmax(66px,17%)
+    minmax(30px,7%)
+    minmax(0,55%)
+    minmax(92px,21%) !important;
+}
+
+/* Larger game information text */
+.infoGrid{
+  gap:clamp(6px,.9vh,11px) !important;
+}
+
+.card{
+  padding:clamp(8px,1.15vh,14px) clamp(10px,1.2vw,15px) !important;
+  justify-content:space-between !important;
+}
+
+.card b{
+  font-size:clamp(9px,1.2vh,14px) !important;
+  line-height:1 !important;
+  margin-bottom:clamp(4px,.55vh,7px) !important;
+  letter-spacing:1.4px !important;
+}
+
+.card span{
+  flex:1;
+  display:flex !important;
+  align-items:center !important;
+  font-size:clamp(15px,2.25vh,27px) !important;
+  line-height:1.03 !important;
+  font-weight:900 !important;
+  -webkit-line-clamp:3 !important;
+}
+
+/* Bottom statistics now use the entire card height */
+.statsDock{
+  grid-template-columns:1fr 1fr !important;
+  gap:clamp(7px,1vh,12px) !important;
+}
+
+.teamStatsCard{
+  padding:clamp(9px,1.25vh,15px) !important;
+  grid-template-rows:minmax(34px,20%) minmax(0,80%) !important;
+  gap:clamp(5px,.7vh,8px) !important;
+}
+
+.teamStatsHeader{
+  display:flex !important;
+  align-items:center !important;
+  font-size:clamp(15px,2.25vh,28px) !important;
+  line-height:.95 !important;
+  letter-spacing:.5px !important;
+}
+
+.teamStatsHeader b{
+  font-size:clamp(8px,1.05vh,12px) !important;
+  padding:5px 8px !important;
+}
+
+.teamStatsList{
+  display:grid !important;
+  grid-template-rows:repeat(4,minmax(0,1fr)) !important;
+  height:100% !important;
+  min-height:0 !important;
+  gap:clamp(3px,.4vh,5px) !important;
+}
+
+.statLine{
+  min-height:0 !important;
+  height:100% !important;
+  padding:clamp(4px,.6vh,7px) clamp(2px,.3vw,5px) !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:8px !important;
+  border-bottom:1px solid rgba(255,255,255,.10) !important;
+  font-size:clamp(12px,1.8vh,22px) !important;
+  line-height:1 !important;
+}
+
+.statLine:last-child{
+  border-bottom:0 !important;
+}
+
+.statLine span:first-child{
+  font-size:inherit !important;
+  font-weight:800 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+
+.statLine span:last-child{
+  min-width:clamp(42px,5vw,70px);
+  text-align:right;
+  font-size:clamp(16px,2.35vh,29px) !important;
+  font-weight:1000 !important;
+}
+
+/* Main team labels and score are also easier to read */
+.teamName{
+  font-size:clamp(23px,3.8vh,49px) !important;
+  line-height:.84 !important;
+}
+
+.scoreLabel{
+  font-size:clamp(15px,2.35vh,29px) !important;
+}
+
+.scoreSub{
+  font-size:clamp(9px,1.25vh,14px) !important;
+}
+
+.centerMeta{
+  font-size:clamp(12px,1.8vh,21px) !important;
+  font-weight:900 !important;
+}
+
+/* Hide unused top-title logo styles completely */
+.titleSide,
+.titleLogoWrap,
+.titleLogo,
+.titleLogoFallback{
+  display:none !important;
+}
+
+@media(max-height:720px),(max-width:720px){
+  .poster{
+    grid-template-rows:6% minmax(0,66%) minmax(0,28%) !important;
+  }
+
+  .hero{
+    grid-template-rows:16% 7% 55% 22% !important;
+  }
+
+  .titleTeam{
+    font-size:clamp(28px,6.4vh,61px) !important;
+  }
+
+  .card b{
+    font-size:7px !important;
+  }
+
+  .card span{
+    font-size:clamp(10px,1.45vh,14px) !important;
+  }
+
+  .teamStatsCard{
+    padding:6px !important;
+    grid-template-rows:minmax(24px,19%) minmax(0,81%) !important;
+  }
+
+  .teamStatsHeader{
+    font-size:clamp(10px,1.5vh,14px) !important;
+  }
+
+  .statLine{
+    padding:3px 2px !important;
+    font-size:clamp(9px,1.2vh,12px) !important;
+  }
+
+  .statLine span:last-child{
+    min-width:30px;
+    font-size:clamp(11px,1.55vh,15px) !important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   BOLD MATCHUP HEADLINE + CLEAN TEAM BACKGROUNDS
+   ========================================================= */
+
+/* Remove the oval/circle backplates behind the two main team logos */
+.logoWrap{
+  background:none !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+
+.logoWrap::before,
+.logoWrap::after,
+.team::before,
+.team::after{
+  display:none !important;
+  content:none !important;
+}
+
+.teamLogo{
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.72)) !important;
+}
+
+/* Make the matchup title the unmistakable main headline */
+.poster{
+  grid-template-rows:
+    minmax(42px,5%)
+    minmax(0,67%)
+    minmax(0,28%) !important;
+}
+
+.hero{
+  grid-template-rows:
+    minmax(105px,24%)
+    minmax(28px,6%)
+    minmax(0,50%)
+    minmax(92px,20%) !important;
+}
+
+.gameTitleCenter{
+  padding:clamp(8px,1.25vh,16px) clamp(8px,1vw,15px) !important;
+  border-radius:16px !important;
+  border-width:3px !important;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb,var(--a),#02040a 62%),
+      #02040a 43%,
+      #02040a 57%,
+      color-mix(in srgb,var(--b),#02040a 62%)
+    ) !important;
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.72),
+    inset 0 0 0 2px rgba(255,255,255,.08) !important;
+}
+
+.titleTeam{
+  font-size:clamp(52px,10.8vh,138px) !important;
+  line-height:.72 !important;
+  font-weight:1000 !important;
+  letter-spacing:clamp(-2px,-.12vw,-1px) !important;
+  -webkit-text-stroke:clamp(1px,.16vh,2px) rgba(0,0,0,.95) !important;
+  text-shadow:
+    0 4px 0 #000,
+    0 9px 22px rgba(0,0,0,1),
+    0 0 18px var(--titleColor) !important;
+}
+
+.vsWord{
+  font-size:clamp(18px,3.5vh,43px) !important;
+  min-width:clamp(46px,6vw,76px) !important;
+  padding:clamp(7px,1vh,12px) clamp(7px,.9vw,12px) !important;
+  font-weight:1000 !important;
+  border-radius:10px !important;
+}
+
+/* Keep the rest of the layout compact so the title gains room */
+.centerMeta{
+  font-size:clamp(11px,1.55vh,18px) !important;
+  padding:clamp(3px,.45vh,6px) clamp(8px,1vw,12px) !important;
+}
+
+.teams{
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(330px,55%)
+    minmax(0,1fr) !important;
+}
+
+/* Team panels use clean rectangular fills, not decorative shapes */
+.team{
+  background:rgba(4,7,13,.94) !important;
+  border-radius:18px !important;
+}
+
+.team:first-child{
+  border-left:5px solid var(--a) !important;
+}
+
+.team:nth-child(3){
+  border-right:5px solid var(--b) !important;
+}
+
+@media(max-height:720px),(max-width:720px){
+  .poster{
+    grid-template-rows:5% minmax(0,67%) minmax(0,28%) !important;
+  }
+
+  .hero{
+    grid-template-rows:23% 6% 50% 21% !important;
+  }
+
+  .titleTeam{
+    font-size:clamp(36px,8vh,76px) !important;
+    line-height:.74 !important;
+  }
+
+  .vsWord{
+    font-size:clamp(12px,2.2vh,20px) !important;
+    min-width:34px !important;
+    padding:5px !important;
+  }
+
+  .gameTitleCenter{
+    padding:6px !important;
+    border-width:2px !important;
+  }
+
+  .teams{
+    grid-template-columns:minmax(0,1fr) minmax(235px,52%) minmax(0,1fr) !important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   TEAM NAME / ABBREVIATION ALIGNMENT FIX
+   ========================================================= */
+
+/* Score-box team names always remain contained and centered */
+.scoreTeam{
+  min-width:0 !important;
+  overflow:hidden !important;
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  align-items:center !important;
+}
+
+.scoreLabel{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:1.8em !important;
+  margin:0 0 5px !important;
+  padding:0 3px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  line-height:.88 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+  overflow:hidden !important;
+}
+
+/* Prevent long names such as Kansas City Royals from leaving their panel */
+.teamName{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:1.8em !important;
+  padding:0 4px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+
+/* Clean abbreviation fallback — no oval, no offset background */
+.logoFallback{
+  display:none !important;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  place-items:center !important;
+  border:0 !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:#fff !important;
+  font-size:clamp(28px,6vh,72px) !important;
+  line-height:1 !important;
+  text-align:center !important;
+  text-shadow:
+    0 3px 0 #000,
+    0 8px 18px rgba(0,0,0,.9) !important;
+}
+
+.teamLogo.broken + .logoFallback,
+.teamLogo[src=""] + .logoFallback{
+  display:grid !important;
+}
+
+.teamLogo.broken,
+.teamLogo[src=""]{
+  display:none !important;
+}
+
+/* Keep COL / team abbreviations centered in the lower score row */
+.scoreSub{
+  width:100% !important;
+  min-width:0 !important;
+  padding:3px 2px 0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  line-height:1 !important;
+}
+
+/* Disable skin-specific circular logo formatting that caused offset ovals */
+.skin-1 .teamLogo,
+.skin-14 .team,
+.skin-16 .scoreBox{
+  border-radius:0 !important;
+}
+
+.skin-1 .teamLogo{
+  background:transparent !important;
+  padding:0 !important;
+}
+
+@media(max-height:720px),(max-width:720px){
+  .scoreLabel{
+    min-height:1.65em !important;
+    padding:0 2px !important;
+  }
+
+  .teamName{
+    min-height:1.7em !important;
+  }
+
+  .logoFallback{
+    font-size:clamp(22px,4.8vh,48px) !important;
+  }
+}
+</style>
+
+</head>
+<body>
+<button class='flipBtn' onclick='toggleFlip()'>Flip Screen</button>
+<div class="rotator"><div class="stage" id="stage">
+  <div class="bg" id="bg"></div><div class="logoGhost" id="logoGhost"></div><div class="fx" id="fx"></div><div class="scoreFlash" id="scoreFlash"></div>
+  <div class="controls"><button class="btn" id="manageBtn">Manage Games</button><button class="btn" id="pauseBtn">Pause</button><button class="btn" id="fsBtn">Fullscreen</button></div>
+  <div class="poster" id="poster"></div><div class="dots" id="dots"></div>
+</div></div>
+<script>
+const LEAGUES={
+ nfl:{path:'football/nfl',label:'NFL',emoji:'🏈',accent:'#3f8f5f'}, nba:{path:'basketball/nba',label:'NBA',emoji:'🏀',accent:'#e98134'}, mlb:{path:'baseball/mlb',label:'MLB',emoji:'⚾',accent:'#4a8cff'}, nhl:{path:'hockey/nhl',label:'NHL',emoji:'🏒',accent:'#66d9ef'}, wnba:{path:'basketball/wnba',label:'WNBA',emoji:'🏀',accent:'#ff8c2e'}, mls:{path:'soccer/usa.1',label:'MLS',emoji:'⚽',accent:'#63d471'}, ncaaf:{path:'football/college-football',label:'NCAAF',emoji:'🏈',accent:'#9b6bff'}, ncaam:{path:'basketball/mens-college-basketball',label:'NCAAM',emoji:'🎓',accent:'#c05a82'}, epl:{path:'soccer/eng.1',label:'EPL',emoji:'⚽',accent:'#b15cff'}
+};
+const PATTERNS=[
+ 'repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 1px,transparent 1px 54px),repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 54px)',
+ 'radial-gradient(circle at 20% 20%,rgba(255,255,255,.18),transparent 12%),radial-gradient(circle at 70% 80%,rgba(255,255,255,.12),transparent 15%)',
+ 'repeating-conic-gradient(from 0deg,rgba(255,255,255,.07) 0 6deg,transparent 6deg 16deg)',
+ 'linear-gradient(45deg,rgba(255,255,255,.08) 25%,transparent 25% 50%,rgba(255,255,255,.08) 50% 75%,transparent 75%)',
+ 'repeating-linear-gradient(135deg,rgba(255,255,255,.10) 0 2px,transparent 2px 18px)',
+ 'radial-gradient(ellipse at center,transparent 0 38%,rgba(255,255,255,.12) 39%,transparent 42%)',
+ 'linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent),repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 2px,transparent 2px 6px)',
+ 'repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.08) 0 1px,transparent 1px 22px)'
+];
+let active=new Set(['nfl','nba','mlb','nhl','wnba','mls','ncaaf','ncaam','epl']);let cache={},selected=[],idx=0,timer,paused=false,leaderCache={},lastScores={},globalTicker=[];let gameWindow=localStorage.getItem('sportswall-window')||'live2h';
+let autoFillEnabled=localStorage.getItem('sportswall-autofill')==='true';
+let autoFillLeagues=new Set(JSON.parse(localStorage.getItem('sportswall-autofill-leagues')||'["nfl","ncaaf","ncaam"]'));
+let autoFillLimit=Math.max(1,Math.min(30,parseInt(localStorage.getItem('sportswall-autofill-limit')||'12',10)||12));
+const $=id=>document.getElementById(id),poster=$('poster'),stage=$('stage'),dots=$('dots'),fx=$('fx'),bg=$('bg'),flash=$('scoreFlash');
+function ymd(d){return d.toISOString().slice(0,10).replace(/-/g,'')}function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function color(hex,fb){return hex&&/^[0-9a-fA-F]{6}$/.test(hex)&&!['000000','ffffff'].includes(hex.toLowerCase())?'#'+hex:fb}function logo(t){return t&&t.logos&&t.logos[0]?t.logos[0].href:''}
+function normalize(json,k){if(!json||!json.events)return[];return json.events.map(ev=>{let c=ev.competitions&&ev.competitions[0];if(!c)return null;let h=(c.competitors||[]).find(x=>x.homeAway==='home')||c.competitors[0],a=(c.competitors||[]).find(x=>x.homeAway==='away')||c.competitors[1];if(!h||!a)return null;let fb=LEAGUES[k].accent;return {id:ev.id,league:k,date:ev.date,state:ev.status.type.state,detail:ev.status.type.shortDetail||ev.status.type.detail||'',period:ev.status.period,clock:ev.status.displayClock,venue:c.venue?c.venue.fullName:'',broadcast:c.broadcasts&&c.broadcasts[0]&&c.broadcasts[0].names?c.broadcasts[0].names.join('/ '):'',neutral:c.neutralSite,home:{name:h.team.displayName||h.team.shortDisplayName||h.team.name,short:h.team.shortDisplayName||h.team.name,abbr:h.team.abbreviation||'',score:h.score,record:h.records&&h.records[0]?h.records[0].summary:'',color:color(h.team.color,fb),logo:logo(h.team)},away:{name:a.team.displayName||a.team.shortDisplayName||a.team.name,short:a.team.shortDisplayName||a.team.name,abbr:a.team.abbreviation||'',score:a.score,record:a.records&&a.records[0]?a.records[0].summary:'',color:color(a.team.color,fb),logo:logo(a.team)}}}).filter(Boolean)}
+async function refreshLeague(k){try{let now=new Date(),past=new Date(Date.now()-86400000),future=new Date(Date.now()+86400000);let extra=`?limit=200&dates=${ymd(past)}-${ymd(future)}`;if(k==='ncaam')extra+=`&groups=50`;let r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[k].path}/scoreboard${extra}`);cache[k]=normalize(await r.json(),k)}catch(e){cache[k]=cache[k]||[]}}
+function eligible(g){
+  let t=new Date(g.date).getTime(),n=Date.now();
+
+  if(gameWindow==='live'){
+    return g.state==='in';
+  }
+
+  if(gameWindow==='next24'){
+    // Upcoming games beginning within the next 24 hours, plus games already live.
+    return g.state==='in'||(g.state==='pre'&&t>=n&&t-n<=24*60*60*1000);
+  }
+
+  // Live games plus games that ended/posted in the last 2 hours.
+  return g.state==='in'||(g.state==='post'&&n-t<=2*60*60*1000&&n>=t);
+}
+function allGames(){return Object.keys(cache).flatMap(k=>cache[k]||[]).filter(eligible).sort((a,b)=>{
+  const order={in:0,post:1,pre:2};
+  return (order[a.state]??9)-(order[b.state]??9)||new Date(a.date)-new Date(b.date);
+})}
+function pruneSelected(){selected=selected.filter(s=>{let g=find(s.league,s.id);return g&&eligible(g)}); if(idx>=selected.length) idx=0;}
+function find(l,id){return(cache[l]||[]).find(g=>g.id===id)}
+function makeSelection(g){return {league:g.league,id:g.id,skin:Math.floor(Math.random()*20),pattern:Math.floor(Math.random()*PATTERNS.length),seed:Math.random()}}
+function autoFillSelection(force=false){
+  if(!autoFillEnabled&&!force)return;
+  const preferred=allGames().filter(g=>autoFillLeagues.has(g.league));
+  const oldMap=new Map(selected.map(s=>[s.league+'|'+s.id,s]));
+  selected=preferred.slice(0,autoFillLimit).map(g=>oldMap.get(g.league+'|'+g.id)||makeSelection(g));
+  if(idx>=selected.length)idx=0;
+  try{
+    localStorage.setItem('sportswall-selected',JSON.stringify(selected));
+    localStorage.setItem('sportswall-autofill',String(autoFillEnabled));
+    localStorage.setItem('sportswall-autofill-leagues',JSON.stringify([...autoFillLeagues]));
+    localStorage.setItem('sportswall-autofill-limit',String(autoFillLimit));
+  }catch(e){}
+}
+function fallbackSelect(){
+  pruneSelected();
+  if(autoFillEnabled){
+    autoFillSelection();
+    return;
+  }
+  let games=allGames();
+  if(!selected.length)selected=games.slice(0,12).map(makeSelection);
+}
+async function fetchLeaders(g){
+  const key=g.league+'-'+g.id;
+  const cached=leaderCache[key];
+  if(cached && Date.now()-cached._ts<30000) return;
+  const packet={_ts:Date.now(),teams:{}};
+  packet.teams[g.away.abbr]=[];
+  packet.teams[g.home.abbr]=[];
+  try{
+    const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${LEAGUES[g.league].path}/summary?event=${g.id}`,{cache:'no-store'});
+    const j=await r.json();
+    const comp=(j.header&&j.header.competitions&&j.header.competitions[0])||(j.competitions&&j.competitions[0]);
+    if(comp && comp.venue && comp.venue.fullName) g.venue=comp.venue.fullName;
+    function clean(v){return String(v??'').trim()}
+    function good(v){v=clean(v);return v && !['--','—','-','null','undefined'].includes(v.toLowerCase())}
+    function abbrOf(team){return team&&(team.abbreviation||team.abbrev||team.shortDisplayName||team.name)||''}
+    function sideForAbbr(ab){
+      ab=clean(ab).toUpperCase();
+      if(ab && ab===clean(g.away.abbr).toUpperCase()) return g.away.abbr;
+      if(ab && ab===clean(g.home.abbr).toUpperCase()) return g.home.abbr;
+      return ab||'';
+    }
+    function add(team,label,value,priority=50){
+      team=sideForAbbr(team); label=friendlyStatLabel(label,g.league); value=clean(value);
+      if(!team||!packet.teams[team]||!good(label)||!good(value)) return;
+      const exists=packet.teams[team].some(x=>x.label===label&&x.value===value);
+      if(!exists) packet.teams[team].push({label,value,priority});
+    }
+    function statMap(stats){
+      const m={};
+      (stats||[]).forEach(st=>{
+        const label=st.displayName||st.shortDisplayName||st.label||st.name||st.abbreviation;
+        const val=st.displayValue??st.value??st.summary;
+        if(good(label)&&good(val)){
+          const k=String(label).toLowerCase().replace(/[^a-z0-9%]+/g,'');
+          m[k]={label,value:String(val)};
+        }
+      });
+      return m;
+    }
+    function pickStats(teamAbbr,stats){
+      const m=statMap(stats);
+      const want={
+        mlb:[['Runs',['runs','r']],['Hits',['hits','h']],['Errors',['errors','e']],['Left On Base',['leftonbase','lob']]],
+        nba:[['FG %',['fieldgoalpct','fg%','fieldgoals%','fieldgoalpercentage']],['Rebounds',['rebounds','reb']],['Assists',['assists','ast']],['Turnovers',['turnovers','to']]],
+        wnba:[['FG %',['fieldgoalpct','fg%','fieldgoals%','fieldgoalpercentage']],['Rebounds',['rebounds','reb']],['Assists',['assists','ast']],['Turnovers',['turnovers','to']]],
+        nfl:[['Total Yards',['totalyards','totyds','totalyds']],['Passing Yards',['passingyards','passyds']],['Rushing Yards',['rushingyards','rushyds']],['Turnovers',['turnovers','to']]],
+        ncaaf:[['Total Yards',['totalyards','totyds','totalyds']],['Passing Yards',['passingyards','passyds']],['Rushing Yards',['rushingyards','rushyds']],['Turnovers',['turnovers','to']]],
+        nhl:[['Shots',['shots','shotstotal']],['Faceoff %',['faceoffpercent','faceoff%','faceoffpct']],['Power Plays',['powerplaygoals','powerplays']],['Penalty Minutes',['penaltyminutes','pim']]],
+        mls:[['Possession',['possession','possessionpct','possession%']],['Shots',['shots']],['Shots On Goal',['shotsongoal','sog']],['Corners',['corners','cornerkicks']]],
+        epl:[['Possession',['possession','possessionpct','possession%']],['Shots',['shots']],['Shots On Goal',['shotsongoal','sog']],['Corners',['corners','cornerkicks']]],
+        wc:[['Possession',['possession','possessionpct','possession%']],['Shots',['shots']],['Shots On Goal',['shotsongoal','sog']],['Corners',['corners','cornerkicks']]],
+        ncaam:[['FG %',['fieldgoalpct','fg%','fieldgoals%','fieldgoalpercentage']],['Rebounds',['rebounds','reb']],['Assists',['assists','ast']],['Turnovers',['turnovers','to']]]
+      }[g.league]||[];
+      let used=new Set();
+      want.forEach(([nice,keys],i)=>{
+        for(const k of keys){
+          let hit=Object.entries(m).find(([mk])=>mk===k||mk.includes(k));
+          if(hit&&!used.has(hit[0])){used.add(hit[0]);add(teamAbbr,nice,hit[1].value,i);return;}
+        }
+      });
+    }
+    if(j.boxscore&&Array.isArray(j.boxscore.teams)){
+      j.boxscore.teams.forEach(t=>pickStats(abbrOf(t.team),t.statistics||t.stats));
+    }
+    if(comp&&Array.isArray(comp.competitors)){
+      comp.competitors.forEach(c=>pickStats(abbrOf(c.team),c.statistics||c.stats));
+    }
+    function addLeader(team,label,top,priority){
+      if(!top) return;
+      const player=top.athlete&&(top.athlete.shortName||top.athlete.displayName)||top.displayName||top.name;
+      const val=top.displayValue||top.value||top.summary;
+      if(good(player)&&good(val)) add(team,label,`${player} · ${val}`,priority);
+    }
+    (j.leaders||[]).forEach(tb=>{
+      const ab=abbrOf(tb.team);
+      (tb.leaders||[]).forEach((cat,ci)=>addLeader(ab,cat.shortDisplayName||cat.displayName||cat.name,(cat.leaders||[])[0],10+ci));
+    });
+    if(j.boxscore&&Array.isArray(j.boxscore.players)){
+      j.boxscore.players.forEach(p=>{
+        const ab=abbrOf(p.team);
+        (p.statistics||[]).forEach(group=>{
+          (group.leaders||[]).slice(0,2).forEach((top,i)=>addLeader(ab,group.shortDisplayName||group.displayName||group.name,top,18+i));
+        });
+      });
+    }
+    Object.keys(packet.teams).forEach(ab=>{
+      packet.teams[ab].sort((x,y)=>x.priority-y.priority);
+      packet.teams[ab]=packet.teams[ab].slice(0,4);
+    });
+  }catch(e){
+    console.warn('summary stats failed',e);
+  }
+  leaderCache[key]=packet;
+}
+function statValue(v){return (v===undefined||v===null||v===''||v==='--'||v==='—')?'Not posted':String(v)}
+function friendlyStatLabel(label,league){
+  let raw=String(label||'Top Stat').trim();
+  let k=raw.toLowerCase().replace(/[^a-z0-9%]+/g,'');
+  const map={
+    pts:'Points', points:'Points', reb:'Rebounds', rebounds:'Rebounds', ast:'Assists', assists:'Assists', stl:'Steals', blk:'Blocks',
+    hr:'Home Runs', homeruns:'Home Runs', rbi:'RBIs', rbis:'RBIs', r:'Runs', runs:'Runs', h:'Hits', hits:'Hits', avg:'Batting Avg', era:'ERA', so:'Strikeouts', k:'Strikeouts',
+    totalyards:'Total Yards', passingyards:'Passing Yards', rushingyards:'Rushing Yards', turnovers:'Turnovers', firstdowns:'First Downs',
+    pass:'Passing', passing:'Passing', rush:'Rushing', rushing:'Rushing', rec:'Receiving', receiving:'Receiving', yds:'Yards', yards:'Yards',
+    goals:'Goals', gls:'Goals', shots:'Shots', shotsongoal:'Shots On Goal', sog:'Shots On Goal', saves:'Saves', possession:'Possession', corners:'Corners', cornerkicks:'Corners',
+    fieldgoalpct:'FG %', fieldgoalpercentage:'FG %', fg:'FG %', 'fg%':'FG %', faceoffpercent:'Faceoff %', faceoffpct:'Faceoff %'
+  };
+  if(map[k]) return map[k];
+  return raw.replace(/\bHR\b/i,'Home Runs').replace(/\bRBI\b/i,'RBIs').replace(/\bPTS\b/i,'Points').replace(/\bREB\b/i,'Rebounds').replace(/\bAST\b/i,'Assists').replace(/\bSOG\b/i,'Shots On Goal');
+}
+function leadersForTeam(g,team){
+  const packet=leaderCache[g.league+'-'+g.id];
+  if(packet && packet.teams && packet.teams[team.abbr]) return packet.teams[team.abbr];
+  return [];
+}
+function teamStatsHTML(g,side){
+  const team=g[side];
+  const lines=leadersForTeam(g,team).filter(x=>x.label&&x.value);
+  const body=lines.length
+    ? lines.map(x=>`<div class="statLine"><span>${esc(x.label)}</span><span>${esc(x.value)}</span></div>`).join('')
+    : `<div class="statLine empty"><span>Game stats</span><span>ESPN has not posted them yet</span></div>`;
+  return `<div class="teamStatsCard" style="--teamColor:${team.color}"><div class="teamStatsHeader"><span>${esc(team.short)}</span><b>${side==='away'?'AWAY':'HOME'}</b></div><div class="teamStatsList">${body}</div></div>`;
+}
+function matchupStatsHTML(g){return teamStatsHTML(g,'away')+teamStatsHTML(g,'home')}
+function timeStr(d){return new Date(d).toLocaleString([], {weekday:'short',hour:'numeric',minute:'2-digit'})}function countdown(d){let ms=new Date(d)-Date.now();if(ms<=0)return '';let h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return `STARTS IN ${h}H ${m}M`}
+function makeFx(skin){ fx.innerHTML=''; /* particles disabled for Fire TV performance */ }
+function render(){fallbackSelect();if(!selected.length){poster.innerHTML='<div style="place-self:center;text-align:center"><h1 style="font:72px Bebas Neue;color:var(--gold)">NO GAMES FOUND</h1><p>Open Manage Games after games load.</p></div>';return}let sel=selected[idx%selected.length],g=find(sel.league,sel.id);if(!g){idx=(idx+1)%selected.length;return render()}let scoreKey=g.league+'-'+g.id,score=(g.away.score||'')+'-'+(g.home.score||'');if(lastScores[scoreKey]&&lastScores[scoreKey]!==score){flash.classList.remove('on');void flash.offsetWidth;flash.classList.add('on')}lastScores[scoreKey]=score;fetchLeaders(g).then(()=>{let e=document.querySelector('.statsDock');if(e&&selected[idx%selected.length]===sel)e.innerHTML=matchupStatsHTML(g)});
+let skin=sel.skin??Math.floor(Math.random()*20),pat=sel.pattern??Math.floor(Math.random()*PATTERNS.length),a=g.away.color,b=g.home.color;stage.className='stage skin-'+skin;stage.style.setProperty('--a',a);stage.style.setProperty('--b',b);stage.style.setProperty('--gold',LEAGUES[g.league].accent);stage.style.setProperty('--logoA',g.away.logo?`url("${g.away.logo}")`:'none');stage.style.setProperty('--logoB',g.home.logo?`url("${g.home.logo}")`:'none');bg.style.setProperty('--pattern',PATTERNS[pat]);bg.style.setProperty('--pattern2',PATTERNS[(pat+7)%PATTERNS.length]);bg.style.setProperty('--sparkX',(20+Math.floor(Math.random()*60))+'%');bg.style.setProperty('--sparkY',(15+Math.floor(Math.random()*70))+'%');bg.style.setProperty('--angle',(80+Math.floor(sel.seed*220))+'deg');bg.style.setProperty('--x1',(10+Math.floor(sel.seed*50))+'%');bg.style.setProperty('--y1',(10+Math.floor((1-sel.seed)*45))+'%');bg.style.setProperty('--x2',(55+Math.floor((1-sel.seed)*35))+'%');bg.style.setProperty('--y2',(48+Math.floor(sel.seed*35))+'%');makeFx(skin);
+let status=g.state==='in'?'LIVE':g.state==='post'?'FINAL':'UPCOMING',cls=g.state==='in'?'live':g.state==='post'?'final':'upcoming';let scoreLine=g.state==='pre'?`<div class="score countdown">${countdown(g.date)||timeStr(g.date)}</div>`:`<div class="scorePair"><div class="scoreTeam" style="--teamScoreColor:${a}"><div class="scoreLabel">${esc(g.away.short)}</div><div class="score">${esc(g.away.score??'–')}</div><div class="scoreSub">AWAY · ${esc(g.away.abbr||'')}</div></div><div class="score sep">–</div><div class="scoreTeam" style="--teamScoreColor:${b}"><div class="scoreLabel">${esc(g.home.short)}</div><div class="score">${esc(g.home.score??'–')}</div><div class="scoreSub">HOME · ${esc(g.home.abbr||'')}</div></div></div>`;
+poster.innerHTML=`<div class="topBar"><div class="matchFull">${LEAGUES[g.league].emoji} ${LEAGUES[g.league].label} · ${timeStr(g.date)}</div><div class="statusStack"><div class="clock" id="clock"></div></div></div><div class="hero"><div class="gameTitleCenter">
+  <span class="titleTeam titleAway" style="--titleColor:${a}">${esc(g.away.short)}</span>
+  <span class="vsWord">VS</span>
+  <span class="titleTeam titleHome" style="--titleColor:${b}">${esc(g.home.short)}</span>
+</div><div class="centerMeta">${esc(g.detail)} ${g.clock?' · '+esc(g.clock):''}</div><div class="teams"><div class="team"><div class="logoWrap" style="--tc:${a}"><img class="teamLogo" src="${esc(g.away.logo)}" alt="${esc(g.away.short)} logo" onerror="this.classList.add('broken')"><div class="logoFallback">${esc(g.away.abbr||g.away.short.slice(0,3))}</div></div><div class="teamName">${esc(g.away.short)}</div></div><div class="scoreBox">${scoreLine}</div><div class="team"><div class="logoWrap" style="--tc:${b}"><img class="teamLogo" src="${esc(g.home.logo)}" alt="${esc(g.home.short)} logo" onerror="this.classList.add('broken')"><div class="logoFallback">${esc(g.home.abbr||g.home.short.slice(0,3))}</div></div><div class="teamName">${esc(g.home.short)}</div></div></div><div class="infoGrid"><div class="card"><b>Venue</b><span>${esc(g.venue||'Not listed')}</span></div><div class="card"><b>Broadcast</b><span>${esc(g.broadcast||'Not listed')}</span></div><div class="card"><b>Game Time</b><span>${esc(timeStr(g.date))}</span></div><div class="card"><b>Game Info</b><span>${esc(g.detail||status)}</span></div></div></div><div class="bottom"><div class="statsDock">${matchupStatsHTML(g)}</div></div>`;requestAnimationFrame(fitVisibleText);renderDots();updateClock();renderTicker()}
+
+function fitTextElement(el,minPx,maxPx){
+  if(!el)return;
+  const box=el.parentElement;
+  if(!box)return;
+  el.style.fontSize=maxPx+'px';
+  let size=maxPx;
+  const maxWidth=Math.max(1,box.clientWidth-8);
+  const maxHeight=Math.max(1,box.clientHeight-6);
+  while(size>minPx&&(el.scrollWidth>maxWidth||el.scrollHeight>maxHeight)){
+    size-=1;
+    el.style.fontSize=size+'px';
+  }
+}
+function fitVisibleText(){
+  document.querySelectorAll('.scoreLabel').forEach(el=>fitTextElement(el,11,34));
+  document.querySelectorAll('.teamName').forEach(el=>fitTextElement(el,13,46));
+  document.querySelectorAll('.titleTeam').forEach(el=>fitTextElement(el,25,138));
+  document.querySelectorAll('.card span').forEach(el=>fitTextElement(el,12,30));
+}
+window.addEventListener('resize',()=>requestAnimationFrame(fitVisibleText));
+
+function renderDots(){dots.innerHTML=''}function renderTicker(){let games=allGames().slice(0,25);let text=games.map(g=>`<span><b>${LEAGUES[g.league].label}</b> ${esc(g.away.abbr||g.away.short)}: ${g.away.score??'—'}  |  ${esc(g.home.abbr||g.home.short)}: ${g.home.score??'—'} · ${esc(g.detail||timeStr(g.date))}</span>`).join('');let t=$('tickerTrack');if(t)t.innerHTML=text+text}
+function next(){if(!selected.length)return;idx=(idx+1)%selected.length;render()}function reset(){clearInterval(timer);timer=setInterval(()=>{if(!paused)next()},15000)}function updateClock(){let c=$('clock');if(c)c.textContent=new Date().toLocaleString([], {weekday:'short',hour:'numeric',minute:'2-digit',second:'2-digit'})}setInterval(updateClock,1000);
+async function refreshAll(){await Promise.all([...new Set([...active,...autoFillLeagues])].map(refreshLeague));pruneSelected();fallbackSelect();renderTicker();render()}
+async function softRefresh(){
+  if(document.hidden)return;
+  await Promise.all([...new Set([...active,...autoFillLeagues,...selected.map(s=>s.league)])].map(refreshLeague));
+  pruneSelected();
+  if(autoFillEnabled)autoFillSelection();
+  renderTicker();
+  render();
+}
+
+const LIVE_REFRESH_MS=2*60*1000;
+const IDLE_REFRESH_MS=5*60*1000;
+let refreshTimer=null;
+
+function hasLiveGames(){
+  return allGames().some(g=>g.state==='in');
+}
+
+function scheduleDataRefresh(delay){
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(runScheduledRefresh,delay);
+}
+
+async function runScheduledRefresh(){
+  if(document.hidden){
+    refreshTimer=null;
+    return;
+  }
+  try{
+    await softRefresh();
+  }finally{
+    scheduleDataRefresh(hasLiveGames()?LIVE_REFRESH_MS:IDLE_REFRESH_MS);
+  }
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    clearTimeout(refreshTimer);
+    refreshTimer=null;
+  }else{
+    runScheduledRefresh();
+  }
+});
+$('pauseBtn').onclick=()=>{paused=!paused;$('pauseBtn').textContent=paused?'Play':'Pause'};$('fsBtn').onclick=()=>{let el=document.documentElement;(el.requestFullscreen||el.webkitRequestFullscreen||(()=>Promise.reject())).call(el).catch(()=>toast('Fullscreen blocked. Press full screen in Silk if available.'));document.body.classList.add('kiosk');setTimeout(()=>document.body.classList.remove('kiosk'),5000)};function toast(m){let x=document.createElement('div');x.className='toast';x.textContent=m;stage.appendChild(x);setTimeout(()=>x.remove(),3000)}
+$('manageBtn').onclick=()=>openManage();function openManage(){paused=true;let o=document.createElement('div');o.className='overlay';stage.appendChild(o);function draw(){let games=allGames();let allOn=games.length&&games.every(g=>selected.some(s=>s.league===g.league&&s.id===g.id));let filterText=gameWindow==='live'?'LIVE GAMES ONLY':gameWindow==='next24'?'UPCOMING GAMES IN THE NEXT 24 HOURS':'LIVE + FINALS FROM LAST 2 HOURS';o.innerHTML=`<div class="panel"><h2>Manage Games</h2><div style="color:#aaa">Choose what appears in the rotation. Current filter: ${filterText}. Scores refresh every 2 minutes during live games and every 5 minutes otherwise; refreshing pauses when this tab is hidden.</div>
+<div class="autoFillBox">
+  <div class="autoFillHeading">
+    <div><strong>Automatic Game Fill</strong><small>Automatically builds the rotation from your chosen sports and leagues.</small></div>
+    <button class="autoFillToggle ${autoFillEnabled?'on':''}" id="autoFillToggle">${autoFillEnabled?'AUTO FILL ON':'AUTO FILL OFF'}</button>
+  </div>
+  <div class="autoFillLeagueGrid">${Object.entries(LEAGUES).map(([k,l])=>`<button class="autoLeague ${autoFillLeagues.has(k)?'on':''}" data-auto-league="${k}"><span>${l.emoji}</span>${l.label}</button>`).join('')}</div>
+  <div class="autoFillActions">
+    <label>Maximum games <select id="autoFillLimit">${[4,6,8,10,12,16,20,24,30].map(n=>`<option value="${n}" ${autoFillLimit===n?'selected':''}>${n}</option>`).join('')}</select></label>
+    <button class="btn autoNow" id="autoFillNow">Fill Rotation Now</button>
+  </div>
+</div>
+<div class="chips windowChips"><button class="chip ${gameWindow==='next24'?'on':''}" data-window="next24">Next 24 Hours</button><button class="chip ${gameWindow==='live2h'?'on':''}" data-window="live2h">Live + Last 2h</button><button class="chip ${gameWindow==='live'?'on':''}" data-window="live">Live Only</button></div><div class="chips">${Object.entries(LEAGUES).map(([k,l])=>`<button class="chip ${active.has(k)?'on':''}" data-l="${k}">${l.emoji} ${l.label}</button>`).join('')}</div><div class="section">Available Games</div><div style="display:flex;gap:10px;margin:8px 0 12px"><button class="btn" id="selectAllBtn">${allOn?'Remove All Available':'Select All Available'}</button><button class="btn" id="clearBtn">Clear Rotation</button></div>${games.map(g=>{let on=selected.some(s=>s.league===g.league&&s.id===g.id);let tag=g.state==='in'?'LIVE':g.state==='pre'?'UPCOMING · NEXT 24H':'FINAL · LAST 2H';return `<div class="gameRow"><div><strong>${esc(g.away.name)} @ ${esc(g.home.name)}</strong><small>${LEAGUES[g.league].label} · ${tag} · ${esc(g.detail||timeStr(g.date))}</small></div><button class="add ${on?'remove':''}" data-g="${g.league}|${g.id}">${on?'Remove':'Add'}</button></div>`}).join('')||'<p>No games match this filter right now.</p>'}<div class="section">In Rotation: ${selected.length}</div><button class="btn" id="doneBtn">Done</button></div>`;
+o.querySelector('#autoFillToggle').onclick=async()=>{
+  autoFillEnabled=!autoFillEnabled;
+  localStorage.setItem('sportswall-autofill',String(autoFillEnabled));
+  if(autoFillEnabled){
+    await Promise.all([...autoFillLeagues].map(refreshLeague));
+    autoFillSelection();
+  }
+  draw();
+};
+o.querySelectorAll('[data-auto-league]').forEach(b=>b.onclick=async()=>{
+  const k=b.dataset.autoLeague;
+  if(autoFillLeagues.has(k))autoFillLeagues.delete(k);else{autoFillLeagues.add(k);await refreshLeague(k)}
+  localStorage.setItem('sportswall-autofill-leagues',JSON.stringify([...autoFillLeagues]));
+  if(autoFillEnabled)autoFillSelection();
+  draw();
+});
+o.querySelector('#autoFillLimit').onchange=e=>{
+  autoFillLimit=parseInt(e.target.value,10)||12;
+  localStorage.setItem('sportswall-autofill-limit',String(autoFillLimit));
+  if(autoFillEnabled)autoFillSelection();
+  draw();
+};
+o.querySelector('#autoFillNow').onclick=async()=>{
+  await Promise.all([...autoFillLeagues].map(refreshLeague));
+  autoFillSelection(true);
+  draw();
+};
+o.querySelectorAll('[data-window]').forEach(b=>b.onclick=()=>{gameWindow=b.dataset.window;localStorage.setItem('sportswall-window',gameWindow);pruneSelected();if(autoFillEnabled)autoFillSelection();draw()});o.querySelectorAll('.chip[data-l]').forEach(b=>b.onclick=async()=>{let k=b.dataset.l;if(active.has(k))active.delete(k);else{active.add(k);await refreshLeague(k)}pruneSelected();draw()});o.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{let [l,id]=b.dataset.g.split('|'),p=selected.findIndex(s=>s.league===l&&s.id===id);if(p>=0)selected.splice(p,1);else{let g=find(l,id);if(g)selected.push(makeSelection(g))}draw()});o.querySelector('#selectAllBtn').onclick=()=>{if(allOn){selected=selected.filter(s=>!games.some(g=>g.league===s.league&&g.id===s.id))}else{games.forEach(g=>{if(!selected.some(s=>s.league===g.league&&s.id===g.id))selected.push(makeSelection(g))})}draw()};o.querySelector('#clearBtn').onclick=()=>{selected=[];draw()};o.querySelector('#doneBtn').onclick=()=>{o.remove();paused=false;idx=0;pruneSelected();render();reset()}}draw()}
+window.addEventListener('click',()=>{if(document.body.classList.contains('kiosk')){document.body.classList.remove('kiosk');setTimeout(()=>document.body.classList.add('kiosk'),5000)}},true);
+(async()=>{
+  try{
+    let s=JSON.parse(localStorage.getItem('sportswall-selected')||'[]');
+    if(s.length)selected=s;
+    idx=parseInt(localStorage.getItem('sportswall-idx')||'0')||0;
+  }catch(e){}
+  await refreshAll();
+  reset();
+  scheduleDataRefresh(hasLiveGames()?LIVE_REFRESH_MS:IDLE_REFRESH_MS);
+  setInterval(()=>{
+    try{
+      localStorage.setItem('sportswall-selected',JSON.stringify(selected));
+      localStorage.setItem('sportswall-idx',String(idx));
+    }catch(e){}
+  },30000);
+})();
+</script>
+
+<script>
+let rotation = parseInt(localStorage.getItem('sportswallRotation')||'0',10);
+
+function applyRotation(){
+  document.documentElement.style.transform='rotate('+rotation+'deg)';
+  document.documentElement.style.transformOrigin='center center';
+  document.documentElement.style.width='100vw';
+  document.documentElement.style.height='100vh';
+  localStorage.setItem('sportswallRotation',rotation);
+}
+
+function toggleFlip(){
+  rotation=(rotation+90)%360;
+  applyRotation();
+}
+
+applyRotation();
+</script>
+
+</body>
+</html>
