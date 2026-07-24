@@ -2212,6 +2212,165 @@ body.kiosk .screenControls{
   line-height:1.05;
 }
 </style>
+<style>
+/* Simplified center display: no duplicate team names beside the score/time. */
+.teamName,
+.teamRec{
+  display:none !important;
+}
+.scoreBox{
+  width:100% !important;
+  min-width:0 !important;
+  padding:clamp(12px,2vh,24px) !important;
+  display:grid !important;
+  place-items:center !important;
+}
+.mainDisplay{
+  width:100%;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  font-family:Oswald,Impact,sans-serif;
+  font-weight:900;
+  line-height:.82;
+  letter-spacing:-.04em;
+  text-shadow:0 0 42px rgba(0,0,0,.8);
+}
+.liveScore{
+  gap:clamp(12px,3vw,42px);
+  font-size:clamp(88px,22vh,280px);
+}
+.startDisplay{
+  font-size:clamp(58px,14vh,180px);
+  color:var(--gold);
+  letter-spacing:-.02em;
+}
+.mainSeparator{
+  color:rgba(246,241,231,.58);
+  font-size:.58em;
+  letter-spacing:0;
+}
+@media (max-width:720px), (max-height:720px){
+  .liveScore{font-size:clamp(62px,17vh,170px);gap:clamp(8px,2vw,22px)}
+  .startDisplay{font-size:clamp(42px,11vh,110px)}
+}
+</style>
+<style>
+/* Portrait-first layout: keep all text inside the visible screen. */
+html, body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden;
+}
+
+.stage,
+.game,
+.scoreBox,
+.matchup,
+.team,
+.cards,
+.card{
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+.titleTeam,
+.headline,
+.mainDisplay,
+.gameMeta,
+.venue,
+.broadcast,
+.status,
+.clock,
+.card span,
+.card strong{
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+
+@media (orientation:portrait){
+  .stage{
+    padding-left:clamp(8px,2.5vw,22px) !important;
+    padding-right:clamp(8px,2.5vw,22px) !important;
+  }
+
+  .matchup{
+    width:100% !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr) !important;
+    column-gap:clamp(4px,1.6vw,14px) !important;
+  }
+
+  .titleTeam,
+  .headline{
+    width:100% !important;
+    white-space:nowrap !important;
+    font-size:clamp(24px,7vw,64px);
+    line-height:.92 !important;
+    letter-spacing:-.045em !important;
+  }
+
+  .mainDisplay{
+    width:100% !important;
+    white-space:nowrap !important;
+    line-height:.82 !important;
+  }
+
+  .liveScore{
+    font-size:clamp(72px,22vw,190px) !important;
+    gap:clamp(6px,2vw,18px) !important;
+  }
+
+  .startDisplay{
+    font-size:clamp(44px,13vw,115px) !important;
+  }
+
+  .gameMeta,
+  .venue,
+  .broadcast,
+  .status,
+  .clock{
+    width:100% !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+    line-height:1.08 !important;
+    font-size:clamp(12px,3.2vw,25px);
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:clamp(5px,1.6vw,12px) !important;
+  }
+
+  .card{
+    padding:clamp(6px,1.5vw,12px) !important;
+    overflow:hidden !important;
+  }
+
+  .card span,
+  .card strong{
+    width:100% !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    line-height:1.02 !important;
+  }
+
+  .logo,
+  .teamLogo,
+  .team img{
+    max-width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -2419,7 +2578,7 @@ function timeStr(d){return new Date(d).toLocaleString([], {weekday:'short',hour:
 function makeFx(skin){ fx.innerHTML=''; /* particles disabled for Fire TV performance */ }
 function render(){fallbackSelect();if(!selected.length){poster.innerHTML='<div style="place-self:center;text-align:center"><h1 style="font:72px Bebas Neue;color:var(--gold)">NO GAMES FOUND</h1><p>Open Manage Games after games load.</p></div>';return}let sel=selected[idx%selected.length],g=find(sel.league,sel.id);if(!g){idx=(idx+1)%selected.length;return render()}let scoreKey=g.league+'-'+g.id,score=(g.away.score||'')+'-'+(g.home.score||'');if(lastScores[scoreKey]&&lastScores[scoreKey]!==score){flash.classList.remove('on');void flash.offsetWidth;flash.classList.add('on')}lastScores[scoreKey]=score;fetchLeaders(g).then(()=>{let e=document.querySelector('.statsDock');if(e&&selected[idx%selected.length]===sel)e.innerHTML=matchupStatsHTML(g)});
 let skin=sel.skin??Math.floor(Math.random()*20),pat=sel.pattern??Math.floor(Math.random()*PATTERNS.length),a=g.away.color,b=g.home.color;stage.className='stage skin-'+skin;stage.style.setProperty('--a',a);stage.style.setProperty('--b',b);stage.style.setProperty('--gold',LEAGUES[g.league].accent);stage.style.setProperty('--logoA',g.away.logo?`url("${g.away.logo}")`:'none');stage.style.setProperty('--logoB',g.home.logo?`url("${g.home.logo}")`:'none');bg.style.setProperty('--pattern',PATTERNS[pat]);bg.style.setProperty('--pattern2',PATTERNS[(pat+7)%PATTERNS.length]);bg.style.setProperty('--sparkX',(20+Math.floor(Math.random()*60))+'%');bg.style.setProperty('--sparkY',(15+Math.floor(Math.random()*70))+'%');bg.style.setProperty('--angle',(80+Math.floor(sel.seed*220))+'deg');bg.style.setProperty('--x1',(10+Math.floor(sel.seed*50))+'%');bg.style.setProperty('--y1',(10+Math.floor((1-sel.seed)*45))+'%');bg.style.setProperty('--x2',(55+Math.floor((1-sel.seed)*35))+'%');bg.style.setProperty('--y2',(48+Math.floor(sel.seed*35))+'%');makeFx(skin);
-let status=g.state==='in'?'LIVE':g.state==='post'?'FINAL':'UPCOMING',cls=g.state==='in'?'live':g.state==='post'?'final':'upcoming';let scoreLine=g.state==='pre'?`<div class="score countdown">${countdown(g.date)||timeStr(g.date)}</div>`:`<div class="scorePair"><div class="scoreTeam" style="--teamScoreColor:${a}"><div class="scoreLabel">${esc(g.away.short)}</div><div class="score">${esc(g.away.score??'–')}</div><div class="scoreSub">AWAY · ${esc(g.away.abbr||'')}</div></div><div class="score sep">–</div><div class="scoreTeam" style="--teamScoreColor:${b}"><div class="scoreLabel">${esc(g.home.short)}</div><div class="score">${esc(g.home.score??'–')}</div><div class="scoreSub">HOME · ${esc(g.home.abbr||'')}</div></div></div>`;
+let status=g.state==='in'?'LIVE':g.state==='post'?'FINAL':'UPCOMING',cls=g.state==='in'?'live':g.state==='post'?'final':'upcoming';let scoreLine=g.state==='pre'?`<div class="mainDisplay startDisplay">${countdown(g.date)||timeStr(g.date)}</div>`:`<div class="mainDisplay liveScore"><span>${esc(g.away.score??'–')}</span><span class="mainSeparator">–</span><span>${esc(g.home.score??'–')}</span></div>`;
 poster.innerHTML=`<div class="topBar"><div class="matchFull">${LEAGUES[g.league].emoji} ${LEAGUES[g.league].label} · ${timeStr(g.date)}</div><div class="statusStack"><div class="clock" id="clock"></div></div></div><div class="hero"><div class="gameTitleCenter">
   <span class="titleTeam titleAway" style="--titleColor:${a}">${esc(g.away.short)}</span>
   <span class="vsWord">VS</span>
@@ -2620,7 +2779,7 @@ function fitTextToBox(element, options = {}){
 
 function fitAllVisibleText(){
   requestAnimationFrame(() => {
-    document.querySelectorAll('.titleTeam, .headline').forEach(el =>
+    document.querySelectorAll('.titleTeam, .headline, .mainDisplay').forEach(el =>
       fitTextToBox(el, {minSize: 18, nowrap: true})
     );
 
@@ -2652,6 +2811,55 @@ window.addEventListener('orientationchange', () => {
 window.visualViewport?.addEventListener('resize', fitAllVisibleText);
 document.fonts?.ready?.then(fitAllVisibleText);
 fitAllVisibleText();
+</script>
+
+
+<script>
+function shrinkToWidth(el, minPx){
+  if (!el || !el.clientWidth) return;
+
+  el.style.fontSize = '';
+  let size = parseFloat(getComputedStyle(el).fontSize) || 16;
+  el.style.fontSize = size + 'px';
+
+  let guard = 160;
+  while (guard-- > 0 && size > minPx && el.scrollWidth > el.clientWidth + 1){
+    size -= 0.75;
+    el.style.fontSize = size + 'px';
+  }
+}
+
+function fitPortraitText(){
+  requestAnimationFrame(() => {
+    const portrait = window.innerHeight >= window.innerWidth;
+
+    document.querySelectorAll('.titleTeam, .headline').forEach(el => {
+      shrinkToWidth(el, portrait ? 17 : 22);
+    });
+
+    document.querySelectorAll('.mainDisplay').forEach(el => {
+      shrinkToWidth(el, portrait ? 34 : 48);
+    });
+
+    document.querySelectorAll('.gameMeta, .venue, .broadcast, .status, .clock, .card span, .card strong')
+      .forEach(el => {
+        shrinkToWidth(el, portrait ? 10 : 12);
+      });
+  });
+}
+
+const portraitFitObserver = new MutationObserver(fitPortraitText);
+portraitFitObserver.observe(document.body, {
+  childList:true,
+  subtree:true,
+  characterData:true
+});
+
+window.addEventListener('resize', fitPortraitText);
+window.addEventListener('orientationchange', () => setTimeout(fitPortraitText, 250));
+window.visualViewport?.addEventListener('resize', fitPortraitText);
+document.fonts?.ready?.then(fitPortraitText);
+fitPortraitText();
 </script>
 
 </body>
