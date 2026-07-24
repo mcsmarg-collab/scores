@@ -2174,6 +2174,44 @@ body.kiosk .screenControls{
   }
 }
 </style>
+<style>
+/* Prevent important display text from wrapping off-screen. */
+.titleTeam,
+.teamName,
+.scoreLabel,
+.card span,
+.card strong,
+.gameMeta,
+.venue,
+.broadcast,
+.status,
+.clock,
+.headline{
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:clip;
+  overflow-wrap:normal;
+  word-break:keep-all;
+}
+
+.titleTeam,
+.scoreLabel,
+.headline{
+  white-space:nowrap !important;
+}
+
+.teamName,
+.card span,
+.gameMeta,
+.venue,
+.broadcast,
+.status,
+.clock{
+  white-space:normal;
+  line-height:1.05;
+}
+</style>
 </head>
 <body>
 
@@ -2542,6 +2580,78 @@ window.addEventListener('orientationchange', () => {
 });
 window.visualViewport?.addEventListener('resize', applyUprightFit);
 applyUprightFit();
+</script>
+
+
+<script>
+function fitTextToBox(element, options = {}){
+  if (!element || !element.isConnected) return;
+
+  const {
+    minSize = 10,
+    maxSize = null,
+    nowrap = false
+  } = options;
+
+  element.style.fontSize = '';
+  element.style.transform = '';
+  element.style.maxWidth = '100%';
+  element.style.boxSizing = 'border-box';
+
+  if (nowrap) element.style.whiteSpace = 'nowrap';
+
+  const computed = getComputedStyle(element);
+  let size = maxSize || parseFloat(computed.fontSize) || 16;
+  element.style.fontSize = size + 'px';
+
+  let safety = 100;
+  while (
+    safety-- > 0 &&
+    size > minSize &&
+    (
+      element.scrollWidth > element.clientWidth + 1 ||
+      element.scrollHeight > element.clientHeight + 1
+    )
+  ){
+    size -= 1;
+    element.style.fontSize = size + 'px';
+  }
+}
+
+function fitAllVisibleText(){
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.titleTeam, .headline').forEach(el =>
+      fitTextToBox(el, {minSize: 18, nowrap: true})
+    );
+
+    document.querySelectorAll('.scoreLabel').forEach(el =>
+      fitTextToBox(el, {minSize: 14, nowrap: true})
+    );
+
+    document.querySelectorAll('.teamName').forEach(el =>
+      fitTextToBox(el, {minSize: 13})
+    );
+
+    document.querySelectorAll('.card span, .card strong, .gameMeta, .venue, .broadcast, .status, .clock').forEach(el =>
+      fitTextToBox(el, {minSize: 10})
+    );
+  });
+}
+
+const textFitObserver = new MutationObserver(() => fitAllVisibleText());
+textFitObserver.observe(document.body, {
+  childList: true,
+  subtree: true,
+  characterData: true
+});
+
+window.addEventListener('resize', fitAllVisibleText);
+window.addEventListener('orientationchange', () => {
+  setTimeout(fitAllVisibleText, 200);
+});
+window.visualViewport?.addEventListener('resize', fitAllVisibleText);
+document.fonts?.ready?.then(fitAllVisibleText);
+fitAllVisibleText();
 </script>
 
 </body>
